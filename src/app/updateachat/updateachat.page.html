@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Details Achats</ion-title>
+    <ion-buttons slot="primary">
+      <ion-back-button text="Back" icon="" color="tertiary" fill="outline"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+ 
+  
+  <ion-item>
+    <ion-label position="floating">Ref Titre </ion-label>
+    <ion-input readonly="true" type="text" [(ngModel)]="titre"></ion-input>
+  </ion-item>
+  <ion-item >
+    <ion-label position="floating"> Poids (g) </ion-label>
+    <ion-input type="number" [(ngModel)]="poids"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="floating"> Prix D'achat</ion-label>
+    <ion-input type="number" [(ngModel)]="amount"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating"> Client</ion-label>
+    <ion-input type="text" [(ngModel)]="supplier_name"></ion-input>
+  </ion-item>
+ 
+  
+
+  <ion-button expand="block" padding color="tertiary"  (click)="updateachatProses()" fill="outline">Valider</ion-button>
+
+</ion-content>

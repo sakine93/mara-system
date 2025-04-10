@@ -1,0 +1,311 @@
+<ion-header class="ion-no-border">
+	<ion-toolbar>
+		<ion-buttons slot="start" style="margin-top: 40px;display: none;">
+			<ion-menu-button class="bordered"  fill="solid" menu="main-menu" size="large" id="menu"></ion-menu-button> <b>( {{username}} )</b>
+		</ion-buttons>
+   <br><br>
+    <h4 *ngIf="pett === 'caisseb'" style="text-align: center;background-color: #03224c;color: #fff;font-weight: bold;">Barcode par pièces</h4>
+    <h4 *ngIf="pett === 'puppiesp'" style="text-align: center;background-color: #03224c;color: #fff;font-weight: bold;">Barcode par facon</h4>
+    
+    <ion-item  style="display: none;">
+      <ion-label position="floating" >  </ion-label>
+      <ion-input [(ngModel)]="codeacces"></ion-input>
+      <ion-input [(ngModel)]="user_id"></ion-input>
+      
+      <ion-input [(ngModel)]="identification"></ion-input>
+      <ion-input [(ngModel)]="item_location"></ion-input>
+    </ion-item>
+	</ion-toolbar>
+
+	<ion-segment [(ngModel)]="pett">
+    
+    <ion-segment-button value="caisseb" checked style="background-color: #03224c; font-weight: bold; color: #fff;">
+      <ion-icon name="close"></ion-icon>
+      Barcodes
+    </ion-segment-button>
+  
+    <ion-segment-button value="puppiesp" style="width: auto; font-weight: bold; background-color: red; color: #fff;">
+      <ion-icon name="checkmark"></ion-icon>
+      Facon
+    </ion-segment-button>
+  </ion-segment>
+
+
+</ion-header>
+
+<ion-content >
+  <ion-card *ngIf="totalitems>0" >
+    <ion-card-header color="primary" padding>
+      <ion-card-subtitle style="font-size: 12pt;">Nom Barcodeur : {{username}}</ion-card-subtitle>
+      <ion-card-subtitle style="font-size: 12pt;">Matricule : {{user_id}}</ion-card-subtitle>
+      <ion-card-subtitle style="font-size: 11pt;"> {{totalitems}} pieces générés</ion-card-subtitle>
+      <ion-card-subtitle style="font-size: 12pt;">Poids Total : {{totalpoids}} (g)</ion-card-subtitle>
+      <ion-card-subtitle style="font-size: 12pt;">Total Pieces : {{totalpieces}} (p)</ion-card-subtitle>
+      <ion-card-subtitle style="font-size: 12pt;">Stock : {{location_name}}</ion-card-subtitle>
+    </ion-card-header>
+ 
+    
+  </ion-card>
+  <div [ngSwitch]="pett">
+    <ion-list class="home-content" *ngSwitchCase="'caisseb'">
+      <div *ngIf="totalitems==0">
+        <ion-item style="display: none;">
+          <ion-label>REF FACTURE :</ion-label>
+          <ion-input disabled="true" [(ngModel)]="reffacture" type="text" ></ion-input>
+        </ion-item>
+      
+        <ion-item>
+          <ion-label style="font-weight: bold; color: red;">Categorie =></ion-label>
+          <ion-select [(ngModel)]="category" (ionChange)="onChange($event)">
+            <ion-select-option *ngFor="let cat of categories" [value]="cat.nom_categorie">{{ cat.nom_categorie }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+       
+      
+        
+        <ion-item>
+          <ion-label>REF BARCODE :</ion-label>
+          <ion-input disabled="true" [(ngModel)]="name" type="text" ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label style="font-weight: bold; color: red;">Titre Or =></ion-label>
+          <ion-select [(ngModel)]="titress" (ionChange)="onChange($event)">
+            <ion-select-option *ngFor="let tit of titres" [value]="tit.nom_titre">{{ tit.nom_titre }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+     
+        <ion-item>
+          <ion-label style="font-weight: bold; color: red;">Choisir le stock =></ion-label>
+          <ion-select [(ngModel)]="stockss" (ionChange)="onChange($event)">
+            <ion-select-option *ngFor="let sto of stocks" [value]="sto.location_id">{{ sto.location_name }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="fixed">Prix (g) :</ion-label>
+          <ion-input  [(ngModel)]="prix_du_g" type="tel" placeholder="Prix de revient (g)"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Nbre (p)</ion-label>
+          <ion-input
+            type="number"
+            [(ngModel)]="nbrepieces"
+            (ionChange)="verifierLimitePieces()"
+            min="1"
+          ></ion-input>
+        </ion-item>
+        
+        <!-- Message d'erreur en rouge -->
+        <div *ngIf="limiteDepassee" style="color: red; margin-left: 16px;">
+          ❌ Le nombre de pièces ne peut pas dépasser 30.
+        </div>
+        <ion-item style="display: none;">
+          <ion-label position="fixed">System</ion-label>
+          <ion-input  [(ngModel)]="systeme_venteb" type="number" placeholder="barcode"></ion-input>
+        </ion-item>
+      </div>
+      
+      <br>
+        <ion-button [disabled]="limiteDepassee" *ngIf="totalitems==0" expand="full" (click)="confirmerGeneration()" color="primary" ><ion-icon name="add-circle" style="float: right;" ></ion-icon> GENERER  BARCODES</ion-button>
+        <ion-button  *ngIf="totalitems>0" expand="full" (click)="confirmDeleteAll()" color="danger" ><ion-icon name="close" style="float: right;"></ion-icon> ANNULER TOUT</ion-button>
+    
+    </ion-list>
+
+    <ion-list class="home-content" *ngSwitchCase="'puppiesp'">
+      <div *ngIf="totalitems==0">
+        <ion-item style="display: none;">
+          <ion-label>REF FACTURE :</ion-label>
+          <ion-input disabled="true" [(ngModel)]="reffacture" type="text" ></ion-input>
+        </ion-item>
+      
+        <ion-item>
+          <ion-label style="font-weight: bold; color: red;">Categorie =></ion-label>
+          <ion-select [(ngModel)]="category" (ionChange)="onChange($event)">
+            <ion-select-option *ngFor="let cat of categories" [value]="cat.nom_categorie">{{ cat.nom_categorie }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        
+      
+        
+        <ion-item>
+          <ion-label>REF BARCODE :</ion-label>
+          <ion-input disabled="true" [(ngModel)]="name" type="text" ></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label style="font-weight: bold; color: red;">Titre Or =></ion-label>
+          <ion-select [(ngModel)]="titress" (ionChange)="onChange($event)">
+            <ion-select-option *ngFor="let tit of titres" [value]="tit.nom_titre">{{ tit.nom_titre }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+       
+        <ion-item>
+          <ion-label style="font-weight: bold; color: red;">Choisir le stock =></ion-label>
+          <ion-select [(ngModel)]="stockss" (ionChange)="onChange($event)">
+            <ion-select-option *ngFor="let sto of stocks" [value]="sto.location_id">{{ sto.location_name }}</ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="fixed">Prix (g) :</ion-label>
+          <ion-input  [(ngModel)]="prix_du_g" type="tel" placeholder="Prix de revient (g)"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Nbre de (p)</ion-label>
+          <ion-input
+          type="number"
+          [(ngModel)]="nbrepieces"
+          [value]="1"
+          [disabled]="true"
+          min="1"
+        ></ion-input>
+        
+        </ion-item>
+        
+        <!-- Message d'erreur en rouge -->
+        <div *ngIf="limiteDepassee" style="color: red; margin-left: 16px;">
+          ❌ Le nombre de pièces ne peut pas dépasser 30.
+        </div>
+        <ion-item style="display: none;">
+          <ion-label position="fixed">System</ion-label>
+          <ion-input  [(ngModel)]="systeme_ventep" type="number" placeholder="poids"></ion-input>
+        </ion-item>
+      </div>
+      
+      <br>
+        <ion-button [disabled]="limiteDepassee" *ngIf="totalitems==0" expand="full" (click)="confirmerGenerationp()" color="primary" ><ion-icon name="add-circle" style="float: right;"></ion-icon> GENERER  BARCODES POIDS</ion-button>
+        <ion-button  *ngIf="totalitems>0" expand="full" (click)="confirmDeleteAllp()" color="danger" ><ion-icon name="close" style="float: right;"></ion-icon> ANNULER TOUT</ion-button>
+    
+    </ion-list>
+    
+  </div>
+  
+  
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content
+      pullingIcon="arrow-dropdown"
+      pullingText="Pull to refresh"
+      refreshingSpinner="circles"
+      refreshingText="Refreshing...">
+    </ion-refresher-content>
+  </ion-refresher>
+  <ion-segment [(ngModel)]="pet">
+    <ion-segment-button value="caisse" checked style="background-color: #03224c; font-weight: bold; color: #fff;">
+      <ion-icon name="close"></ion-icon>
+      Poids manquant
+    </ion-segment-button>
+  
+    <ion-segment-button value="puppies" style="width: auto; font-weight: bold; background-color: red; color: #fff;">
+      <ion-icon name="checkmark"></ion-icon>
+      Bijoux à jour
+    </ion-segment-button>
+  </ion-segment>
+   <br>
+  <div [ngSwitch]="pet">
+    <ion-list class="home-content" *ngSwitchCase="'caisse'">
+       <!-- Afficher un message s'il n'y a aucun élément -->
+  <div *ngIf="items.length === 0" class="no-data-message">
+    <ion-item lines="none">
+      <ion-label class="ion-text-center" style="width: 100%; color: gray; font-style: italic;">
+        😕 Aucune barcode avec poids manquants trouvée.
+      </ion-label>
+    </ion-item>
+  </div>
+      <!-- Vérifier s'il y a des catégories avant d'afficher -->
+      <ng-container *ngIf="items && items.length > 0">
+        <!-- Boucle pour chaque catégorie -->
+        <ng-container *ngFor="let item of items; let i = index">
+          <ng-container *ngIf="i === 0 || item.category !== items[i - 1]?.category">
+            <!-- Afficher le diviseur pour chaque catégorie -->
+            <ion-item-divider [color]="getCategoryColor(item.category)">
+              {{ item.category }} ({{ getCountByCategory(item.category) }} pieces)
+            </ion-item-divider>
+          </ng-container>
+    
+          <ion-item-sliding>
+            <ion-item (click)="updateItem(item.item_id, item.category, item.type_or,item.systeme_vente)" >
+              <ion-label style="font-weight: bold; font-size: 10pt;">
+                {{ item.type_or }} - ({{ item.category }}) <br>
+                Poids : 
+                <span [ngStyle]="{'color': item.poids ? 'black' : 'red'}">
+                  {{ item.poids || '0' }} (g)
+                </span> <br>
+                
+                Type : 
+                <span>
+                  {{ item.systeme_vente }} 
+                </span> <br>
+                <ion-icon name="barcode"></ion-icon> REF : 00{{ item.item_id }}
+              </ion-label>
+              
+              <ion-avatar slot="end" style="width: 60px; height: 60px;">
+                <img src="../../assets/assane.png" alt="image">
+              </ion-avatar>
+            </ion-item>
+    
+            <ion-item-options side="start">
+              <ion-item-option style="margin-top: 0px; font-weight: bold;" color="danger" (click)="delItems(item.item_id)">Annuler</ion-item-option>
+            </ion-item-options>
+    
+      
+          </ion-item-sliding>
+        </ng-container>
+      </ng-container>
+    </ion-list>
+    
+  <ion-list class="home-content"  *ngSwitchCase="'puppies'" >
+     <!-- Afficher un message s'il n'y a aucun élément -->
+  <div *ngIf="items.length === 0" class="no-data-message">
+    <ion-item lines="none">
+      <ion-label class="ion-text-center" style="width: 100%; color: gray; font-style: italic;">
+        😕 Aucune barcode avec poids a jour trouvée.
+      </ion-label>
+    </ion-item>
+  </div>
+    <ion-item-sliding *ngFor="let item of itemss2">
+      
+      <ion-item-options side="start">
+        <ion-item-option style="margin-top: 0px;font-weight: bold;" color="danger" (click)="delItems(item.item_id)">Annuler</ion-item-option>
+      </ion-item-options>
+     
+      <ion-item>
+      
+        <ion-label style="font-weight: bold; font-size: 10pt;">
+          {{ item.type_or }} - ({{ item.category }}) <br>
+          Poids : 
+          <span [ngStyle]="{'color': item.poids ? 'black' : 'red'}">
+            {{ item.poids || '0' }} (g)
+          </span> <br>
+          <ion-icon name="barcode"></ion-icon> REF : 00{{ item.item_id }}
+        </ion-label>
+        <ion-avatar slot="end" style="width: 60px;height: 60px;">
+          <ion-icon name="checkmark" size="large"></ion-icon>
+        </ion-avatar>
+      </ion-item>
+  
+      <ion-item-options side="end">
+  
+      
+        <ion-item-option (click)="updateItem(item.item_id,item.category,item.type_or)" style="margin-top: 0px;font-weight: bold;" color="success"><ion-icon name="add-circle"></ion-icon> Modifier Poids</ion-item-option>
+  
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+</div>
+
+
+
+
+</ion-content>
+
+<ion-footer class="footer">
+  <ion-grid>
+    <ion-row>
+  
+    <ion-col style="text-align: center"><ion-button *ngIf="totalitems>0"  (click)="showAlert()" expand="block" shape="round" color="danger"><ion-icon name="send"> </ion-icon> TERMINEE </ion-button></ion-col>
+   
+    </ion-row>
+    <ion-row>
+      <ion-col style="text-align: center"><ion-button *ngIf="totalitems==0"  (click)="annulerq()" expand="block" shape="round" color="danger"><ion-icon name="close"> </ion-icon> Annuler et Quitter </ion-button></ion-col>
+  
+    </ion-row>
+  </ion-grid>
+</ion-footer>

@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Details</ion-title>
+    <ion-buttons slot="primary">
+      <ion-back-button text="Back" icon="" color="tertiary" fill="outline"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+ 
+  <ion-item>
+    <ion-label position="fixed">REF N- :</ion-label>
+    <ion-input type="text" readonly="true"  style="background-color: rgb(245, 245, 245);font-weight: bold;color: #000" [(ngModel)]="id"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="fixed">CAT :</ion-label>
+    <ion-input  readonly="true" style="font-weight: bold;color: #000;background-color: rgb(245, 245, 245)" placeholder="" type="text" [(ngModel)]="category"></ion-input>
+  </ion-item>
+  <ion-item>
+    <ion-label position="fixed">Type :</ion-label>
+    <ion-input  readonly="true" style="font-weight: bold;color: #000;background-color: rgb(245, 245, 245)" placeholder="" type="text" [(ngModel)]="systeme_vente"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="fixed">Poids (g) :</ion-label>
+    <ion-input  style="font-weight: bold;color: #000;" type="number" [(ngModel)]="poids"></ion-input>
+  </ion-item>
+  <ion-item *ngIf="systeme_vente === 'poids'">
+    <ion-label position="fixed">Quantité :</ion-label>
+    <ion-input type="number" [(ngModel)]="quantity" style="font-weight: bold;color: #000;"></ion-input>
+  </ion-item>
+  
+ 
+  <h5 *ngIf="images.length === 0" text-center>Choisir la  photo de bijoux</h5>
+
+
+<ion-list>
+  <ion-item *ngFor="let img of images; index as pos">
+<ion-thumbnail  slot="start">
+  <ion-img [src]="img.path"></ion-img>
+</ion-thumbnail><br>
+
+<br>
+
+<ion-input  readonly="true" placeholder="img" type="text">{{img.name}}</ion-input>
+
+
+<ion-button slot="end" fill="clear" (click)="deleteImage(img)">
+  <ion-icon slot="icon-only" name="trash"></ion-icon>
+</ion-button>
+
+
+
+  </ion-item>
+  
+</ion-list>
+
+<ion-button *ngIf="messerreur=='' " expand="block" padding color="tertiary" (click)="updateProsesItems()" >Valider </ion-button>
+
+</ion-content>
