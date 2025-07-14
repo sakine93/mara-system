@@ -231,7 +231,7 @@ async uploadImageData(formData : FormData){
 
   await loading.present();
 
-  this.http.post("http://mobile.bijouteriess.com/server_cap/upload.php",formData).
+  this.http.post("http://mobile.bijouteriess.com/server_apitawfekh/upload.php",formData).
   pipe(
     finalize(()=>{
       loading.dismiss();

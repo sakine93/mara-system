@@ -11,7 +11,7 @@
       </ion-button>
     </ion-buttons>
   
-    <ion-title style="font-weight: bold;text-align: center;color: #fcb800;">(GOLD'OR) <br></ion-title>
+    <ion-title style="font-weight: bold;text-align: center;color: #fcb800;">(TAWFEKH GOLD) <br></ion-title>
     <ion-buttons slot="end"  (click)="faireinv()" style="margin-top: 10px;">
       <ion-button fill="clear" >
         <ion-icon slot="icon-only" name="barcode"></ion-icon>
@@ -61,7 +61,7 @@
   
   <ion-card style="background-color: #03224c; margin-top: 1px;">
     <ion-card-header>
-      <img class="card-image"   *ngIf="username!=''" src="../../assets/gold1.png">
+      <img class="card-image"   *ngIf="username!=''" src="../../assets/icon.jpg">
       <ion-card-subtitle style="color: #fff;">Dernier Montant lancé </ion-card-subtitle>
       <ion-card-title style="color: #fff;">{{totalvente | number:seperatorWitSpace}} (FCFA)</ion-card-title>
       <ion-card-subtitle style="color: #fff;">Poids: {{nbrepoids | number:seperatorWitSpace}} (g)</ion-card-subtitle>
@@ -207,7 +207,7 @@
           <p style="font-weight:bold;color: #000;">Poids :  {{customer.poids}} ( g )</p>
           <p style="font-weight:bold;color: red;">Vendu par  :  {{customer.type_v}}</p>
         </ion-label>
-        <img src="https://mobile.bijouteriess.com/server_cap/uploads/{{customer.pic_filename}}" style="width: 100px; height: auto; margin-left: 20px;" alt="NO PHOTO">
+        <img src="https://mobile.bijouteriess.com/server_apitawfekh/uploads/{{customer.pic_filename}}" style="width: 100px; height: auto; margin-left: 20px;" alt="NO PHOTO">
       </ion-item>
    
     

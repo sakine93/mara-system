@@ -4,7 +4,7 @@ import 'rxjs/add/operator/map';
 
 @Injectable()
 export class PostProvider {
-    server: string = 'https://mobile.bijouteriegold-or.com/';
+    server: string = 'https://mobile.bijouteriess.com/server_apitawfekh';
 
     constructor(public http: Http) {
 
