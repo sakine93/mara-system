@@ -11,7 +11,7 @@
       </ion-button>
     </ion-buttons>
   
-    <ion-title style="font-weight: bold;text-align: center;color: #fcb800;">(TAWFEKH GOLD) <br></ion-title>
+    <ion-title style="font-weight: bold;text-align: center;color: #fcb800;">(NEGOCE D'OR) <br></ion-title>
     <ion-buttons slot="end"  (click)="faireinv()" style="margin-top: 10px;">
       <ion-button fill="clear" >
         <ion-icon slot="icon-only" name="barcode"></ion-icon>
@@ -46,6 +46,8 @@
   <ion-input  style="display: none;" [(ngModel)]="user_id"></ion-input>
   <ion-input  style="display: none;" [(ngModel)]="phone_number"></ion-input>
   <ion-input style="display: none;" [(ngModel)]="type_piece"></ion-input>
+  <ion-input style="display: none;" [(ngModel)]="boutique"></ion-input>
+  
  
   <style>
     .card-image {
@@ -61,7 +63,7 @@
   
   <ion-card style="background-color: #03224c; margin-top: 1px;">
     <ion-card-header>
-      <img class="card-image"   *ngIf="username!=''" src="../../assets/icon.jpg">
+      <img class="card-image"   *ngIf="username!=''" src="../../assets/logosslat.jpg">
       <ion-card-subtitle style="color: #fff;">Dernier Montant lancé </ion-card-subtitle>
       <ion-card-title style="color: #fff;">{{totalvente | number:seperatorWitSpace}} (FCFA)</ion-card-title>
       <ion-card-subtitle style="color: #fff;">Poids: {{nbrepoids | number:seperatorWitSpace}} (g)</ion-card-subtitle>
@@ -155,7 +157,14 @@
       </ion-item-options>
       <ion-item-divider color="danger">
         <ion-label style="font-weight: bold;font-size: 8pt;">
-          <ion-icon name="qr-scanner" size="small"></ion-icon> {{customer.name}} - ({{customer.type_or}} - <b style="color: blueviolet;">|</b> => {{customer.category}} ) =><b style="font-size: 12pt;" *ngIf="customer.location_id==33" >Habib</b><b style="font-size: 12pt;" *ngIf="customer.location_id==7" >solution</b><b style="font-size: 12pt;" *ngIf="customer.location_id==8" >marie</b>
+          <ion-icon name="qr-scanner" size="small"></ion-icon>
+          {{ customer.name }} - ({{ customer.type_or }} 
+          <b style="color: blueviolet;">|</b> => {{ customer.category }} )
+        
+          <!-- Affiche le nom si la location est dispo -->
+          <b style="font-size: 12pt;" *ngIf="labelFor(customer.location_id) as loc">
+            {{ loc }}
+          </b>
         </ion-label>
       </ion-item-divider>
       <ion-item>
@@ -193,8 +202,19 @@
       <ion-item-options side="start">
         <ion-item-option style="margin-top: 35px;font-weight: bold;" color="danger" (click)="delCustomers(customer.num_sale)">Annuler</ion-item-option>
       </ion-item-options>
-      <ion-item-divider style="background-color: #03224c;color: #fcb800;">
-        ({{customer.type_or}}) =><b style="font-size: 12pt;" *ngIf="customer.systeme_vente=='poids'" >(Vente Par Facon)</b> <b style="font-size: 12pt;" *ngIf="customer.systeme_vente=='barcode'" >(Vente Barcode)</b>
+      <ion-item-divider style="background-color:#03224c;color:#fcb800;">
+        ({{customer.type_or}})
+        <b style="font-size:12pt;" *ngIf="customer.systeme_vente=='poids'">(Vente Par Barcode)</b>
+        <b style="font-size:12pt;" *ngIf="customer.systeme_vente=='barcode'">(Vente Barcode)</b>
+        <b style="font-size:12pt;" *ngIf="customer.location_id=='36'">(BIJOUX LIBERTE 5)</b>
+        <b style="font-size:12pt;" *ngIf="customer.location_id=='34'">(BIJOUX HML)</b>
+      
+        <!-- ⚠️ Alerte si la boutique de l'employé ne correspond pas à la location du bijou -->
+        <ion-badge color="danger" style="margin-left:8px;font-weight:700;"
+          *ngIf="(boutique==='LIBERTE' && customer.location_id!='36')
+              || (boutique==='HLM' && customer.location_id!='34')">
+          Hors de votre stock
+        </ion-badge>
       </ion-item-divider>
       <ion-item style="background-color: #fcb800">
      
@@ -205,9 +225,9 @@
           <h2 style="font-weight: bold;color: #000;"  *ngIf="customer.item_unit_price==0">PRIX : <b  *ngIf="customer.item_unit_price==0" id="text"> {{customer.item_unit_price | number : seperatorWitSpace}}</b> FCFA</h2>
           <h2 style="font-weight: bold;color: #000;" *ngIf="customer.item_unit_price>0">PRIX : <b  *ngIf="customer.item_unit_price>0"> {{customer.item_unit_price | number : seperatorWitSpace}}</b> FCFA</h2>
           <p style="font-weight:bold;color: #000;">Poids :  {{customer.poids}} ( g )</p>
-          <p style="font-weight:bold;color: red;">Vendu par  :  {{customer.type_v}}</p>
+          <p style="font-weight:bold;color: red;display: none;">Vendu par  :  {{customer.type_v}}</p>
         </ion-label>
-        <img src="https://mobile.bijouteriess.com/server_apitawfekh/uploads/{{customer.pic_filename}}" style="width: 100px; height: auto; margin-left: 20px;" alt="NO PHOTO">
+        <img src="https://mobile.bijouteriess.com/server_apinegoce/uploads/{{customer.pic_filename}}" style="width: 100px; height: auto; margin-left: 20px;" alt="NO PHOTO">
       </ion-item>
    
     
@@ -269,8 +289,21 @@
 </ion-list>
 </div>
 <div *ngIf="isEveryItemPriceValid()">
-  <ion-button *ngIf="totalvente>0"  (click)="showAlert()" expand="block" shape="round" color="success"><ion-icon name="send"> </ion-icon> Envoyer </ion-button>
+<!-- Bouton visible seulement si tout est ok -->
+<div *ngIf="totalvente>0 && !hasMismatch()">
+  <ion-button expand="block" shape="round" color="success" (click)="showAlert()">
+    <ion-icon name="send"></ion-icon>&nbsp;Envoyer
+  </ion-button>
+</div>
 
+<!-- Message si bijou hors stock -->
+<div *ngIf="totalvente>0 && hasMismatch()">
+  <ion-card color="light" style="border-left:4px solid #eb445a;margin-top:8px;">
+    <ion-card-content style="color:#eb445a;font-weight:600;">
+      ⚠️ Un bijou n’est pas dans votre stock autorisé.
+    </ion-card-content>
+  </ion-card>
+</div>
 </div>
 
 </ion-content>

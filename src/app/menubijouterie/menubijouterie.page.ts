@@ -70,7 +70,7 @@ export class MenubijouteriePage implements OnInit {
   menuAchat(){
     //alert('non disponible pour le moment')
     //this.router.navigate(['scaninventaire']);
-    this.router.navigate(['updateachatpoids']);
+    this.router.navigate(['achats']);
    //alert('Non Disponible pour ce compte');
   }
 

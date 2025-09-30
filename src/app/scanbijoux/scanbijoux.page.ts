@@ -304,14 +304,46 @@ export class ScanbijouxPage implements OnInit {
               alert('Erreur: Ce Bijou n\'est pas reconnu dans le système');
               this.closeCamera();
             } else if (this.location_id == this.item_location) {
-              if (this.location_id == 8) {
+            
+             
+              if (this.location_id == 39) {
+                this.stockname = 'Stock RECYCLAGE HML';
+  
+                // Demander à l'utilisateur si c'est une vente par façon ou normale
+                this.alertVenteType();
+              }
+              if (this.location_id == 38) {
+                this.stockname = 'Stock RECYCLAGE LIBERTE5';
+  
+                // Demander à l'utilisateur si c'est une vente par façon ou normale
+                this.alertVenteType();
+              }
+              if (this.location_id == 34) {
                 this.stockname = 'Stock Barcode';
   
                 // Demander à l'utilisateur si c'est une vente par façon ou normale
                 this.alertVenteType();
               }
+              if (this.location_id == 35) {
+                this.stockname = 'Stock HLM POIDS RECU ';
   
-            //  this.erreurboutique();
+                // Demander à l'utilisateur si c'est une vente par façon ou normale
+                this.alertVenteType();
+              }
+              if (this.location_id == 36) {
+                this.stockname = 'Stock Barcode LIBERTE 5';
+  
+                // Demander à l'utilisateur si c'est une vente par façon ou normale
+                this.alertVenteType();
+              }
+              if (this.location_id == 37) {
+                this.stockname = 'Stock ARRIVAGE VOYAGE';
+  
+                // Demander à l'utilisateur si c'est une vente par façon ou normale
+                this.alertVenteType();
+              }
+  
+             this.erreurboutique();
             } else {
               // Cas où le bijou est dans le bon endroit
               this.createdProses();
@@ -335,7 +367,7 @@ export class ScanbijouxPage implements OnInit {
       message: 'Veuillez sélectionner le type de vente',
       buttons: [
         {
-          text: 'Par Facon',
+          text: 'Par Barcode',
           handler: () => {
             this.updateVenteType('Facon');
             this.createdProses();

@@ -60,7 +60,9 @@ images = [];
       this.systeme_vente = data.systeme_vente;
       this.poids = data.poids;
     
-      console.log(data);
+       // <<< ici on vide à chaque entrée
+    this.images = [];
+    this.imgtest = '';
 
       this.plt.ready().then(()=>{
         this.loadStoredImages();
@@ -69,18 +71,19 @@ images = [];
   }
 
   loadStoredImages(){
-this.storage.get(STORAGE_KEY).then(images=> {
-  if(images){
-    let arr = JSON.parse(images);
-    this.images =[];
-    for (let img of arr){
-      let filePath = this.file.dataDirectory + img;
-      let resPath = this.pathForImage(filePath);
-      this.images.push({name:img,path:resPath,filePath:filePath});
-    }
-  }
-})
-  }
+    
+    this.storage.get(STORAGE_KEY).then(images=> {
+      if(images){
+        let arr = JSON.parse(images);
+        this.images =[];
+        for (let img of arr){
+          let filePath = this.file.dataDirectory + img;
+          let resPath = this.pathForImage(filePath);
+          this.images.push({name:img,path:resPath,filePath:filePath});
+        }
+      }
+    })
+      }
 
 
   setDefaultQuantity() {
@@ -98,42 +101,31 @@ this.storage.get(STORAGE_KEY).then(images=> {
     }
   }
 
+
   chargerphoto(){
- 
+     
     this.router.navigate(['/updateitem/']);
     this.loadStoredImages();
   }
-
-  async selectImage(){
+  async selectImage() {
     const actionSheet = await this.actionSheetController.create({
-      header:"Choisir la source de limage",
-      buttons:[
-        /*{
-        text:'Choisir dans la galerie',
-        handler: () =>{
-          this.takePicture(this.camera.PictureSourceType.PHOTOLIBRARY);
-        }
-      },*/
-      {
-        text:'Appareil Photo',
-        handler: () =>{
-          this.takePicture(this.camera.PictureSourceType.CAMERA);
-          this.router.navigate(['/updateitem/']);
-          this.loadStoredImages();
-        }
-      },
-      {
-        text:'Annuler',
-        role :'Cancel'
-
-      }
-   
-      
-    
-    ]
+        header: "Veuillez choisir la photo de l'achat",
+        buttons: [
+            {
+                text: 'Prendre une Photo',
+                handler: () => {
+                    this.takePicture(this.camera.PictureSourceType.CAMERA);
+                  
+                }
+            },
+            {
+                text: 'Annuler ',
+                role: 'cancel'
+            }
+        ]
     });
     await actionSheet.present();
-  }
+}
 
   takePicture(sourceType:PictureSourceType){
     var options: CameraOptions ={
@@ -141,7 +133,10 @@ this.storage.get(STORAGE_KEY).then(images=> {
       sourceType:sourceType,
       saveToPhotoAlbum:false,
       correctOrientation:true,
-      allowEdit:false
+      cameraDirection: 1,
+      allowEdit: true,
+      targetHeight: 200,
+      targetWidth: 200
     };
     this.camera.getPicture(options).then(imagePath => {
       var currentName = imagePath.substr(imagePath.lastIndexOf('/')+1);
@@ -159,36 +154,36 @@ this.updateStoredImages(newFileName);
 
 }
 
-updateStoredImages(name) {
-  this.storage.get(STORAGE_KEY).then(images => {
-      let arr = JSON.parse(images);
-      if (!arr) {
-          let newImages = [name];
-          this.storage.set(STORAGE_KEY, JSON.stringify(newImages));
-      } else {
-          arr.push(name);
-          this.storage.set(STORAGE_KEY, JSON.stringify(arr));
-      }
 
-      let filePath = this.file.dataDirectory + name;
-      let resPath = this.pathForImage(filePath);
-
-      let newEntry = {
-          name: name,
-          path: resPath,
-          filePath: filePath,
-          imgtest :  name
-         
-      };
-      this.startUpload(newEntry);
-      this.images = [newEntry];
-      this.imgtest=name;
-      this.chargerphoto();
-      this.ref.detectChanges(); // trigger change detection cycle
-  });
   
-}
+updateStoredImages(name) {
+this.storage.get(STORAGE_KEY).then(images => {
+    let arr = JSON.parse(images);
+    if (!arr) {
+        let newImages = [name];
+        this.storage.set(STORAGE_KEY, JSON.stringify(newImages));
+    } else {
+        arr.push(name);
+        this.storage.set(STORAGE_KEY, JSON.stringify(arr));
+    }
 
+    let filePath = this.file.dataDirectory + name;
+    let resPath = this.pathForImage(filePath);
+
+    let newEntry = {
+        name: name,
+        path: resPath,
+        filePath: filePath,
+        imgtest :  name
+       
+    };
+    this.startUpload(newEntry);
+    this.images = [newEntry];
+    this.imgtest=name;
+    this.ref.detectChanges(); // trigger change detection cycle
+});
+
+}
 deleteImage(imgEntry,position){
   this.images.splice(position,1);
   this.storage.get(STORAGE_KEY).then(images=>{
@@ -231,7 +226,7 @@ async uploadImageData(formData : FormData){
 
   await loading.present();
 
-  this.http.post("http://mobile.bijouteriess.com/server_apitawfekh/upload.php",formData).
+  this.http.post("https://mobile.bijouteriess.com/server_apinegoce/upload.php",formData).
   pipe(
     finalize(()=>{
       loading.dismiss();
@@ -246,6 +241,7 @@ async uploadImageData(formData : FormData){
   })
 
 }
+
 
 
 async presentToast(text){
@@ -280,7 +276,7 @@ if(nb2<nb3){
 }
 */
   }
-  async updateProsesItems() {
+  async updateProsesItems(imgtest) {
     if (!this.poids || Number(this.poids) <= 0) {
       const toast = await this.toastController.create({
         message: 'Veuillez entrer un poids valide supérieur à 0 pour le bijou svp',
@@ -294,6 +290,7 @@ if(nb2<nb3){
         item_id : this.id,
         poids : this.poids,
         quantity : this.quantity,
+         pic_filename : imgtest,
         // pic_filename : name,
       };
   

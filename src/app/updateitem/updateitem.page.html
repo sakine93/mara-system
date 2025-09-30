@@ -32,30 +32,39 @@
   </ion-item>
   
  
-  <h5 *ngIf="images.length === 0" text-center>Choisir la  photo de bijoux</h5>
+  <ion-card>
+    <ion-card-header style="background-color: #fcb800;font-weight: bold;" (click)="selectImage()">
+      <ion-icon name="camera"  size="small"></ion-icon>  PRENDRE UNE PHOTO 
+    </ion-card-header>
+    <ion-card-content>
+    
+<h3  style="text-align: center;margin-top: 20px;" *ngIf="images.length === 0"> <ion-icon size="large" slot="icon-only" name="cloud-upload"></ion-icon> Choisir une photo par la camera</h3>
 
+      <ion-list>
+       
+        <div *ngIf="images.length > 0" style="margin-top: 15px; text-align: center;">
+          <ion-img [src]="images[0].path" style="max-width: 200px; border-radius: 8px;"></ion-img>
+        </div>
+          <ion-item *ngFor="let img of images; index as pos ">
+            
+        
+            <div>
+            
 
-<ion-list>
-  <ion-item *ngFor="let img of images; index as pos">
-<ion-thumbnail  slot="start">
-  <ion-img [src]="img.path"></ion-img>
-</ion-thumbnail><br>
+              <ion-button slot="end" fill="clear" (click)="deleteImage(img, pos)">
+                <ion-icon  size="large" slot="icon-only" name="trash"></ion-icon>
+              </ion-button>
+            </div> <br>
+          
 
-<br>
-
-<ion-input  readonly="true" placeholder="img" type="text">{{img.name}}</ion-input>
-
-
-<ion-button slot="end" fill="clear" (click)="deleteImage(img)">
-  <ion-icon slot="icon-only" name="trash"></ion-icon>
-</ion-button>
-
-
-
-  </ion-item>
+            
+      
+          </ion-item>
+        </ion-list>
+    </ion-card-content>
   
-</ion-list>
+</ion-card> 
 
-<ion-button *ngIf="messerreur=='' " expand="block" padding color="tertiary" (click)="updateProsesItems()" >Valider </ion-button>
+<ion-button *ngIf="messerreur=='' " expand="block" padding color="tertiary" (click)="updateProsesItems(imgtest)" >Valider </ion-button>
 
 </ion-content>

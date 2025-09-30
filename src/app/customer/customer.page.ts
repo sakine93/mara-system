@@ -26,10 +26,13 @@ export class CustomerPage implements OnInit {
   encodedData: '';
   full_name:any;
   totalparticipetontine:any;
+  // { location_id -> location_name } des enregistrements deleted=0
+activeLocationMap = new Map<number, string>();
   pet:any;
   encodeData: any;
   inputData: any;
   qrData = null;
+  user_id:any;
   createdCode = null;
   scannedCode = null;
   item_id: string = '';
@@ -117,6 +120,8 @@ export class CustomerPage implements OnInit {
   }
 
 
+  
+
   //pour le button
   async choixtitre() {
     const modale = await this.modalController.create({
@@ -172,6 +177,34 @@ export class CustomerPage implements OnInit {
   }
 montrer(){
   this.showAlert();
+}
+
+// Retourne strictement le nom tel qu'en BDD (ou chaîne vide si introuvable/inactif)
+labelFor(id: number): string {
+  return this.activeLocationMap.get(Number(id)) || '';
+}
+
+// Charge les locations actives depuis la BDD (deleted=0)
+// Dans la classe CustomerPage (pas dans une autre méthode)
+async loadActiveLocations(): Promise<void> {
+  return new Promise<void>((resolve) => {
+    const body = { aksi: 'getActiveLocations' };
+    this.postPvdr.postData(body, 'file_aksi.php').subscribe(
+      (res: any) => {
+        if (res && res.success && Array.isArray(res.locations)) {
+          // Map<number,string> défini comme: activeLocationMap = new Map<number, string>();
+          this.activeLocationMap = new Map(
+            res.locations.map((l: any) => [Number(l.location_id), String(l.location_name || '')])
+          );
+        }
+        resolve();
+      },
+      (_err: any) => {
+        // en cas d'erreur API, on résout quand même pour ne pas bloquer
+        resolve();
+      }
+    );
+  });
 }
 
 payment(){
@@ -299,6 +332,8 @@ text:"Annuler",handler:(res)=>{
     this.customerstransf =[];
     this.customerstransfsen =[];
     this.start = 0;
+    this.loadActiveLocations();
+
     this.loadCustomer();
     this.storage.get('session_storage').then((res) => {
       this.anggota = res;
@@ -677,7 +712,7 @@ text:"Annuler",handler:(res)=>{
         aksi: 'envoiecaisse',
         comment : this.comment,
         totalapayer:this.totalapayer,
-     
+        boutique:this.boutique,
        // sale_status : '1',
         codeacces:this.codeacces,
         item_location : this.item_location,
@@ -704,6 +739,22 @@ text:"Annuler",handler:(res)=>{
     }
   }
 
+
+  public hasMismatch(): boolean {
+    if (!Array.isArray(this.customers)) {
+      return false;
+    }
+  
+    if (this.boutique === 'LIBERTE') {
+      return this.customers.some(c => String(c && c.location_id) !== '36');
+    }
+  
+    if (this.boutique === 'HLM') {
+      return this.customers.some(c => String(c && c.location_id) !== '34');
+    }
+  
+    return false; // autres boutiques
+  }
 
   async qrcodeexist() {
     this.verifCode();

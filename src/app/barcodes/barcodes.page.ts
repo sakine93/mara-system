@@ -10,14 +10,14 @@ import { NativeAudio } from '@ionic-native/native-audio/ngx';
 import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner/ngx';
 import { CategorieInfo } from  '../../app/barcodes/categories.model'
 const modeleAbregeParCategorie = {
-  'Bague': 'BG1',
-  'Bracelet': 'BR2',
+  'Bagues': 'BG1',
+  'Bracelets': 'BR2',
   'Boucle d\'oreille': 'BD3',
-  'Chaine': 'CH4',
+  'Chaines': 'CH4',
   'Colliers': 'CO5',
-  'Parure': 'PR6',
-  'Pendentif': 'PD7',
-  'Sautoir': 'ST8',
+  'Parrures': 'PR6',
+  'Pendentifs': 'PD7',
+  'Sautoirs': 'ST8',
   'Pierre': 'PI9',
   'Piercing': 'PC10',
   'Ensemble': 'EM11',
@@ -72,9 +72,9 @@ export class BarcodesPage implements OnInit {
   name :string ='';
   reffacture :any ='';
   formatmodel: string;
-  totalitems :any;
-  totalpoids:any;
-  totalpieces:any;
+  totalitems :number=0;
+  totalpoids:number=0;
+  totalpieces:number=0;
   location_name:any;
   nbre:number;
   identification:any;
@@ -258,12 +258,7 @@ onChange(event) {
         identification : this.identificationchoix,
       };
 
-      let bodymod = {
-        aksi: 'getallmodele',
-        limit : this.limit,
-        start : this.start,
-        identification : this.identification,
-      };
+     
       let bodytit = {
         aksi: 'getalltitre',
         limit : this.limit,
@@ -308,18 +303,41 @@ onChange(event) {
         resolve(true);
       });
 
-      this.postPvdr.postData(body2, 'file_aksi.php').subscribe(data => {
-        for (let item of data.result) {
-          this.nbre =0;
-          this.totalitems =item.totalitems;
-          this.totalpoids=item.totalpoids;
-          this.totalpieces=item.totalpieces;
-          this.location_name=item.location_name;
-        
-         
-        }
-        resolve(true);
-      });
+     // ✅ Compatible anciens TS/targets
+this.postPvdr.postData(body2, 'file_aksi.php').subscribe((data: any) => {
+  // Sécuriser l'accès
+  var r = (data && typeof data === 'object') ? data.result : null;
+
+  if (r && !Array.isArray(r) && typeof r === 'object') {
+    // result = objet unique
+    this.totalitems    = Number(r.totalitems != null ? r.totalitems : 0);
+    this.totalpoids    = Number(r.totalpoids  != null ? r.totalpoids  : 0);
+    this.totalpieces   = Number(r.totalpieces != null ? r.totalpieces : 0);
+    this.location_name = (r.location_name != null ? String(r.location_name) : '');
+  } else if (Array.isArray(r) && r.length > 0) {
+    // result = tableau → on prend la 1ère ligne
+    var item = r[0];
+    this.totalitems    = Number(item && item.totalitems != null ? item.totalitems : 0);
+    this.totalpoids    = Number(item && item.totalpoids  != null ? item.totalpoids  : 0);
+    this.totalpieces   = Number(item && item.totalpieces != null ? item.totalpieces : 0);
+    this.location_name = (item && item.location_name != null ? String(item.location_name) : '');
+  } else {
+    // défaut si rien
+    this.totalitems    = 0;
+    this.totalpoids    = 0;
+    this.totalpieces   = 0;
+    this.location_name = '';
+  }
+
+  resolve(true);
+}, function(_err: any){
+  // défaut en cas d'erreur réseau
+  this.totalitems    = 0;
+  this.totalpoids    = 0;
+  this.totalpieces   = 0;
+  this.location_name = '';
+  resolve(true);
+}.bind(this));
 
       this.postPvdr.postData(body1, 'file_aksi.php').subscribe(data => {
         this.categories = data.result;
@@ -331,10 +349,7 @@ onChange(event) {
         resolve(true);
       });
 
-      this.postPvdr.postData(bodymod, 'file_aksi.php').subscribe(data => {
-        this.modeles = data.result;
-        resolve(true);
-      });
+   
 
       this.postPvdr.postData(bodytit, 'file_aksi.php').subscribe(data => {
         this.titres = data.result;
