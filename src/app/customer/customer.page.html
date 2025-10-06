@@ -11,7 +11,7 @@
       </ion-button>
     </ion-buttons>
   
-    <ion-title style="font-weight: bold;text-align: center;color: #fcb800;">(NEGOCE D'OR) <br></ion-title>
+    <ion-title style="font-weight: bold;text-align: center;color: #fcb800;">(DIANTAL MARA) <br></ion-title>
     <ion-buttons slot="end"  (click)="faireinv()" style="margin-top: 10px;">
       <ion-button fill="clear" >
         <ion-icon slot="icon-only" name="barcode"></ion-icon>
@@ -63,7 +63,7 @@
   
   <ion-card style="background-color: #03224c; margin-top: 1px;">
     <ion-card-header>
-      <img class="card-image"   *ngIf="username!=''" src="../../assets/logosslat.jpg">
+      <img class="card-image"   *ngIf="username!=''" src="../../assets/dianat.jpg">
       <ion-card-subtitle style="color: #fff;">Dernier Montant lancé </ion-card-subtitle>
       <ion-card-title style="color: #fff;">{{totalvente | number:seperatorWitSpace}} (FCFA)</ion-card-title>
       <ion-card-subtitle style="color: #fff;">Poids: {{nbrepoids | number:seperatorWitSpace}} (g)</ion-card-subtitle>
@@ -176,7 +176,7 @@
 
         <ion-item-option style="display: none;" color="secondary" (click)="showCustomer(customer.num_sale,customer.name,customer.item_unit_price)">Voir</ion-item-option>
         <ion-item-option  *ngIf="customer.systeme_vente=='poids'"  (click)="updateCustomerpoids(customer.num_sale,customer.name,customer.item_unit_price,customer.unit_price,customer.locationbijoux,customer.systeme_vente,customer.poids,customer.quantity,customer.item_ids)" style="margin-top: 35px;font-weight: bold;" color="success">Prix et Poids</ion-item-option>
-        <ion-item-option *ngIf="customer.systeme_vente=='barcode'" (click)="updateCustomer(customer.num_sale,customer.name,customer.item_unit_price,customer.prix_vente_g,customer.poids)" style="margin-top: 35px;font-weight: bold;" color="success">Prix de vente</ion-item-option>
+        <ion-item-option *ngIf="customer.systeme_vente=='barcode'" (click)="updateCustomer(customer.num_sale,customer.name,customer.item_unit_price,customer.unit_price,customer.poids)" style="margin-top: 35px;font-weight: bold;" color="success">Prix de vente</ion-item-option>
 
       </ion-item-options>
     </ion-item-sliding>
@@ -206,8 +206,8 @@
         ({{customer.type_or}})
         <b style="font-size:12pt;" *ngIf="customer.systeme_vente=='poids'">(Vente Par Barcode)</b>
         <b style="font-size:12pt;" *ngIf="customer.systeme_vente=='barcode'">(Vente Barcode)</b>
-        <b style="font-size:12pt;" *ngIf="customer.location_id=='36'">(BIJOUX LIBERTE 5)</b>
-        <b style="font-size:12pt;" *ngIf="customer.location_id=='34'">(BIJOUX HML)</b>
+        <b style="font-size:12pt;" *ngIf="customer.location_id=='36'">(BIJOUX MARA 5)</b>
+        <b style="font-size:12pt;" *ngIf="customer.location_id=='34'">(BIJOUX MARA)</b>
       
         <!-- ⚠️ Alerte si la boutique de l'employé ne correspond pas à la location du bijou -->
         <ion-badge color="danger" style="margin-left:8px;font-weight:700;"
@@ -224,10 +224,13 @@
           <h2 style="font-weight: bold;color: #000;">TITRE : {{customer.type_or}}</h2>
           <h2 style="font-weight: bold;color: #000;"  *ngIf="customer.item_unit_price==0">PRIX : <b  *ngIf="customer.item_unit_price==0" id="text"> {{customer.item_unit_price | number : seperatorWitSpace}}</b> FCFA</h2>
           <h2 style="font-weight: bold;color: #000;" *ngIf="customer.item_unit_price>0">PRIX : <b  *ngIf="customer.item_unit_price>0"> {{customer.item_unit_price | number : seperatorWitSpace}}</b> FCFA</h2>
-          <p style="font-weight:bold;color: #000;">Poids :  {{customer.poids}} ( g )</p>
-          <p style="font-weight:bold;color: red;display: none;">Vendu par  :  {{customer.type_v}}</p>
+          <p style="font-weight:bold;color: #000;">Poids : {{ customer.poids }} g</p>
+          <p style="font-weight:bold;color: red;">
+            PV : {{ (customer.unit_price * customer.poids) | number:'1.0-0' }} FCFA
+          </p>
+          
         </ion-label>
-        <img src="https://mobile.bijouteriess.com/server_apinegoce/uploads/{{customer.pic_filename}}" style="width: 100px; height: auto; margin-left: 20px;" alt="NO PHOTO">
+        <img src="https://diantalmara.com/server_apidiantal/uploads/{{customer.pic_filename}}" style="width: 100px; height: auto; margin-left: 20px;" alt="NO PHOTO">
       </ion-item>
    
     
@@ -238,7 +241,7 @@
         <ion-item-option style="display: none;" color="secondary" (click)="showCustomer(customer.num_sale,customer.name,customer.item_unit_price)">Voir</ion-item-option>
      
         <ion-item-option  *ngIf="customer.systeme_vente=='poids'"  (click)="updateCustomerpoids(customer.num_sale,customer.name,customer.item_unit_price,customer.unit_price,customer.location_id,customer.systeme_vente,customer.poids,customer.quantity,customer.item_ids)" style="margin-top: 35px;font-weight: bold;" color="success">Prix et Poids</ion-item-option>
-        <ion-item-option *ngIf="customer.systeme_vente=='barcode'" (click)="updateCustomer(customer.num_sale,customer.name,customer.item_unit_price,customer.prix_vente_g,customer.poids,customer.location_id)" style="margin-top: 35px;font-weight: bold;" color="success">Prix de vente</ion-item-option>
+        <ion-item-option *ngIf="customer.systeme_vente=='barcode'" (click)="updateCustomer(customer.num_sale,customer.name,customer.item_unit_price,customer.unit_price,customer.poids,customer.location_id)" style="margin-top: 35px;font-weight: bold;" color="success">Prixs de vente</ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
 

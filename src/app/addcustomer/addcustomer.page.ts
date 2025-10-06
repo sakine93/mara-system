@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PostProvider } from '../../providers/post-provider';
 import { Router, ActivatedRoute } from '@angular/router';
 import { ToastController } from '@ionic/angular';
-import { async } from 'q';
+
 import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 
 @Component({

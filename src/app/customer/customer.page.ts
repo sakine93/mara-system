@@ -3,7 +3,6 @@ import { Router } from '@angular/router';
 import { ToastController,AlertController,LoadingController, ModalController } from '@ionic/angular';
 import { PostProvider } from '../../providers/post-provider';
 import { Storage } from '@ionic/storage';
-import { QRCodeModule } from 'angularx-qrcode';
 import { Network } from '@ionic-native/network/ngx';
 import { Dialogs } from '@ionic-native/dialogs/ngx';
 import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner/ngx';
@@ -264,26 +263,15 @@ type:'text',name:'comment',placeholder:'Info du client',
 
 
 
-},
-{
-  label:'Avance / Reste',
-  value:'S\'il ya avance indiquer le montant',
-  disabled:true,
-},
-{
-  label:'Total a payer',
-  type:'text',name:'totalapayer',value:0
-  
-  
-  
 }
+
 
 ],
 
 buttons:[
 {text:'Valider et Envoyer',handler:(res)=>{
   this.comment=res.comment;
-  this.totalapayer= res.totalapayer;
+  this.totalapayer= 0;
   this.createdProses();
 
 }
@@ -449,8 +437,8 @@ text:"Annuler",handler:(res)=>{
     return this.customers && this.customers.length > 0 && this.customers.every(c => c.item_unit_price > 0);
   }
 
-  updateCustomer(id,name,item_unit_price,prix_vente_g,poidsvendu,location_id) {
-    this.router.navigate(['/updatecustomer/' + id + '/' + name + '/' + item_unit_price+ '/' + prix_vente_g+ '/' + poidsvendu+ '/' + location_id]);
+  updateCustomer(id,name,item_unit_price,unit_price,poidsvendu,location_id) {
+    this.router.navigate(['/updatecustomer/' + id + '/' + name + '/' + item_unit_price+ '/' + unit_price+ '/' + poidsvendu+ '/' + location_id]);
   }
   updateCustomerpoids(id,name,item_unit_price,prix_vente_g,location_id,systeme_vente) {
     this.router.navigate(['/updatecustomerpoids/' + id + '/' + name + '/' + item_unit_price+ '/' + prix_vente_g+'/' + location_id+'/' + systeme_vente]);

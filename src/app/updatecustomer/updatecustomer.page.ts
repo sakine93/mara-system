@@ -12,6 +12,7 @@ export class UpdatecustomerPage implements OnInit {
 
   name: string = '';
   item_unit_price: number ;
+  unit_price:any;
   systeme_vente:string='';
   id: number;
   location_id:number;
@@ -33,6 +34,7 @@ export class UpdatecustomerPage implements OnInit {
       this.id = data.id;
       this.item_unit_price = data.item_unit_price;
       this.name = data.name;
+      this.unit_price=data.unit_price;
       this.systeme_vente = data.systeme_vente;
       this.prix_du_g = data.prix_du_g;
       this.prix_vente_g = data.prix_vente_g;
@@ -56,10 +58,15 @@ if(nb2<nb3){
 */
   }
   async updateProses() {
-    if ((this.prix_du_g * this.poids) > this.item_unit_price){
+    const prixMinimal = Number(this.unit_price) * Number(this.poids);
+    //alert(this.unit_price);
+    const prixSaisi = Number(this.item_unit_price);
+    
+    if (prixSaisi < prixMinimal) {
       const toast = await this.toastController.create({
-        message: 'Veuillez revoir le prix du grammage svp pois < 1',
-        duration: 2000
+        message: 'Veuillez revoir le prix du grammage svp',
+        duration: 2000,
+        color: 'danger'
       });
       toast.present();
     }

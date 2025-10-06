@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { File, Entry } from '@ionic-native/file/ngx';
 import { Platform, AlertController, ToastController } from '@ionic/angular';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
 import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
@@ -17,7 +16,6 @@ export class MiseajourapkPage implements OnInit {
   constructor( private file: File,
     private plt: Platform,
     private alertCtrl: AlertController,
-    private fileOpener: FileOpener,
     private router: Router,
     private route: ActivatedRoute,
     private toastCtrl: ToastController
@@ -126,30 +124,6 @@ export class MiseajourapkPage implements OnInit {
   }
 
 
-  async itemClicked(file: Entry) {
-    if (this.copyFile) {
-      // Copy is in action!
-      if (!file.isDirectory) {
-        let toast = await this.toastCtrl.create({
-          message: 'Please select a folder for your operation'
-        });
-        await toast.present();
-        return;
-      }
-      // Finish the ongoing operation
-      this.finishCopyFile(file);
-    } else {
-      // Open the file or folder
-      if (file.isFile) {
-        this.fileOpener.open(file.nativeURL, 'text/plain');
-      } else {
-        let pathToOpen =
-          this.folder != '' ? this.folder + '/' + file.name : file.name;
-        let folder = encodeURIComponent(pathToOpen);
-        this.router.navigateByUrl(`/miseajour/${folder}`);
-      }
-    }
-  }
   
   finishCopyFile(file: Entry) {
     let path = this.file.dataDirectory + this.folder;

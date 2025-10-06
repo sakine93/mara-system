@@ -1,6 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { Storage } from '@ionic/storage';
-import { Platform, NavController } from '@ionic/angular';
+import { Platform, NavController, MenuController } from '@ionic/angular';
 import { SplashScreen } from '@ionic-native/splash-screen/ngx';
 import { StatusBar } from '@ionic-native/status-bar/ngx';
 import { Router } from '@angular/router';
@@ -22,12 +22,15 @@ export class AppComponent {
     private router: Router,
     private statusBar: StatusBar,
     public toastController: ToastController,
+    private menuCtrl: MenuController
   ) {
+    
     this.initializeApp();
   }
 
   initializeApp() {
       this.platform.ready().then(() => {
+        this.menuCtrl.swipeGesture(false);
       this.statusBar.styleDefault();
       this.splashScreen.hide();
     });

@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { PostProvider } from '../../providers/post-provider';
 import { Router, ActivatedRoute } from '@angular/router';
-import { AlertController, ModalController, ToastController } from '@ionic/angular';
-import { async } from 'q';
+import { AlertController, IonRouterOutlet, ModalController, Platform, ToastController } from '@ionic/angular';
+
 import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 import { Storage } from '@ionic/storage';
 import { Flashlight } from '@ionic-native/flashlight/ngx';
@@ -12,6 +12,7 @@ import { CategorieInfo } from  '../../app/barcodes/categories.model'
 const modeleAbregeParCategorie = {
   'Bagues': 'BG1',
   'Bracelets': 'BR2',
+  'Bracelet + Bague': 'BRb',
   'Boucle d\'oreille': 'BD3',
   'Chaines': 'CH4',
   'Colliers': 'CO5',
@@ -109,7 +110,8 @@ export class BarcodesPage implements OnInit {
     private nativeAudio: NativeAudio, 
     private alertCtrl:AlertController,
     private barcodeScanner: BarcodeScanner,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private routerOutlet: IonRouterOutlet, private platform: Platform
     ) { 
       this.pet='caisse';
       this.pett='caisseb';
@@ -135,6 +137,9 @@ export class BarcodesPage implements OnInit {
   //usage: getRandomString(20); // pass desired length of random string
   
     ionViewWillEnter() {
+      if (this.platform.is('ios')) {
+        this.routerOutlet.swipeGesture = false; // désactive le swipe retour pour cette page
+      }
       this.items = [];
       this.itemss2 = [];
       this.start = 0;

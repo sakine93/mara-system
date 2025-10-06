@@ -1,74 +1,97 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar>
-    
+<ion-header>
+  <ion-toolbar color="primary">
     <ion-buttons slot="start">
-			<ion-menu-button menu="main-menu"></ion-menu-button>
-		</ion-buttons>
+      <ion-button (click)="closePage()">
+        <ion-icon slot="icon-only" name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Mettre à jour les prix</ion-title>
   </ion-toolbar>
 </ion-header>
 
+<ion-content class="ion-padding">
 
+  <ion-segment [(ngModel)]="mode" color="tertiary" mode="ios">
+    <ion-segment-button value="titre">
+      Par titre
+    </ion-segment-button>
+    <ion-segment-button value="ref">
+      Par référence
+    </ion-segment-button>
+  </ion-segment>
 
-<ion-content>
-  <ion-header collapse="condense">
-    <ion-toolbar color="danger">
-      <ion-title size="small">DEPOT / RETRAIT</ion-title>
-    </ion-toolbar>
-  </ion-header>
- 
+  <!-- MODE : PAR TITRE -->
+  <div *ngIf="mode === 'titre'">
+    <ion-list>
+      <ion-card *ngFor="let titre of titres" class="prix-card">
+        <ion-card-header>
+          <ion-card-title class="titre-name">{{ titre.type_or }}</ion-card-title>
+          <ion-card-subtitle class="last-price">
+            Dernier prix: {{ formatFCFA(titre.unit_price) }}
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <ion-item lines="none">
+            <ion-label position="stacked">Nouveau prix</ion-label>
+            <ion-input inputmode="numeric" type="tel" [(ngModel)]="titre.new_price" placeholder="Entrez le nouveau prix"></ion-input>
+          </ion-item>
 
-   
-  
-    <ion-button expand="block" (click)="verifCode()" style="display: none;">
-      <ion-icon slot="start" name="qr-scanner"></ion-icon>
-      Verifier Code
+          <div class="actions">
+            <ion-button size="small" color="primary" (click)="updateSingleTitre(titre)" [disabled]="titre.updating">
+              {{ titre.updating ? 'Mise à jour...' : 'Mettre à jour ce titre' }}
+            </ion-button>
+            <ion-note *ngIf="titre.updatedAt" class="updated-note">Mis à jour</ion-note>
+          </div>
+
+          <ion-progress-bar *ngIf="titre.updating" [value]="titre.progress" color="tertiary"></ion-progress-bar>
+        </ion-card-content>
+      </ion-card>
+    </ion-list>
+
+    <ion-button expand="block" color="success" (click)="updateAll()" [disabled]="isUpdatingAll">
+      {{ isUpdatingAll ? 'Mise à jour en cours...' : 'Mettre à jour tous les prix' }}
     </ion-button>
 
-    <ion-item style="display: none;">
-      <ion-label position="floating">  </ion-label>
-      <ion-input [(ngModel)]="codeacces">{{codeacces}}</ion-input>
-    </ion-item>
- 
-    <ion-item>
-      <ion-label>Type D'operation</ion-label>
-      <ion-select [(ngModel)]="type_operation">
-        <ion-select-option value="Depot D\'argent">Depot D'argent</ion-select-option>
-        <ion-select-option value="Retrait D\'argent">Retrait D'argent</ion-select-option>
-      </ion-select>
-    </ion-item>
+    <div *ngIf="isUpdatingAll" class="global-progress">
+      <ion-progress-bar [value]="globalProgress"></ion-progress-bar>
+      <p class="progress-text">{{ (globalProgress * 100) | number:'1.0-0' }} %</p>
+    </div>
+  </div>
 
-    <ion-item>
-      <ion-label position="floating"> Info du client : </ion-label>
-      <ion-input type="text"  [(ngModel)]="comment"></ion-input>
-    </ion-item>
+  <!-- MODE : PAR REFERENCE -->
+  <div *ngIf="mode === 'ref'">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Modifier par référence</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="floating">Référence (item_id)</ion-label>
+          <ion-input type="text" [(ngModel)]="refId" placeholder="Ex: 472"></ion-input>
+        </ion-item>
 
-    <ion-item>
-      <ion-label position="floating" > Num Telephone : </ion-label>
-      <ion-input type="text"  [(ngModel)]="phone"></ion-input>
-    </ion-item>
+        <ion-item>
+          <ion-label position="floating">Prix actuel (pour info)</ion-label>
+          <ion-input type="text" [value]="refCurrentPriceDisplay" readonly></ion-input>
+        </ion-item>
 
+        <ion-item>
+          <ion-label position="stacked">Nouveau prix</ion-label>
+          <ion-input inputmode="numeric" type="tel" [(ngModel)]="refNewPrice" placeholder="Entrez le nouveau prix"></ion-input>
+        </ion-item>
 
-  
+        <div class="actions">
+          <ion-button expand="block" color="primary" (click)="fetchRefCurrentPrice()" fill="outline">Rechercher</ion-button>
+          <ion-button expand="block" color="success" (click)="updateByReference()" [disabled]="refUpdating">{{ refUpdating ? 'Mise à jour...' : 'Mettre à jour la référence' }}</ion-button>
+        </div>
 
+        <ion-progress-bar *ngIf="refUpdating" [value]="refProgress" color="tertiary"></ion-progress-bar>
+      </ion-card-content>
+    </ion-card>
+  </div>
 
-
-    <ion-item>
-      <ion-label position="floating" > Montant  </ion-label>
-      <ion-input type="text"  [(ngModel)]="value"></ion-input>
-    </ion-item>
-   
-
-  
-   
-  
-    
-    <ion-button   expand="block" padding color="tertiary"   (click)="createdDepot()" fill="outline">Envoyer</ion-button>
-   
-    
-  
-  
-  
-  
+  <ion-item *ngIf="message" lines="none" class="message-item">
+    <ion-label color="success">{{ message }}</ion-label>
+  </ion-item>
 
 </ion-content>
-

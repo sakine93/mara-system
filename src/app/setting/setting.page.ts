@@ -1,16 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { PostProvider } from '../../providers/post-provider';
-import { Router, ActivatedRoute } from '@angular/router';
-import { AlertController, ToastController } from '@ionic/angular';
-import { async } from 'q';
-import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
-import { Storage } from '@ionic/storage';
-import { Flashlight } from '@ionic-native/flashlight/ngx';
-import { NativeAudio } from '@ionic-native/native-audio/ngx';
-import { Network } from '@ionic-native/network/ngx';
-import { Dialogs } from '@ionic-native/dialogs/ngx';
-import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-scanner/ngx';
-import { FormsModule } from '@angular/forms';
+import { NavController, ToastController } from '@ionic/angular';
+
 @Component({
   selector: 'app-setting',
   templateUrl: './setting.page.html',
@@ -18,296 +9,195 @@ import { FormsModule } from '@angular/forms';
 })
 export class SettingPage implements OnInit {
 
-  scannedData: any;
-  encodedData: '';
-  totalsolde:any;
-  person_id:any;
- 
-  public type_operation: string = '';
-  encodeData: any;
-  inputData: any;
-  qrData = null;
-  createdCode = null;
-  scannedCode = null;
-  comment: any = '';
-  customers: any = [];
-  limit: number = 10;
-  start: number = 0;
-  //sale_status: string = '';
-  phone: string='' ;
-  nom_client:string ='';
-  value :string='';
-  quantity: number = 0;
-  prix_vente_g:number;
-  poids: number = 0;
-  item_location: number ;
- 
-  sale_id: number;
-  codeacces: any;
-  name:String ='';
-  anggota: any;
-  public showCamera = false;
-  public textScanned: any = '';
-  isFlashlight = false;
-  constructor(  private postPvdr: PostProvider,
-    private router: Router,
-    public toastController: ToastController,
-    private actRoute: ActivatedRoute,
-    private storage: Storage,
-    private qrScanner: QRScanner,
-    private torchLight: Flashlight,
-    private nativeAudio: NativeAudio, 
-    private alertCtrl:AlertController,
-    public network:Network,
-      public dialog:Dialogs,
-      private barcodeScanner: BarcodeScanner,
-      
-     
-    ) { 
+  // Mode segment : 'titre' | 'ref'
+  mode: 'titre' | 'ref' = 'titre';
 
-     // this.scanCode();
-    //this.scanBarcode();
-      
-    }
-    scanBarcode() {
-      const options: BarcodeScannerOptions = {
-        preferFrontCamera: false,
-        showFlipCameraButton: true,
-        showTorchButton: true,
-        torchOn: false,
-        prompt: 'Place a barcode inside the scan area',
-        resultDisplayDuration: 500,
-        formats: 'EAN_13,EAN_8,CODE_128,QR_CODE,PDF_417',
-        orientation: 'portrait',
-      };
-  
-      this.barcodeScanner.scan(options).then(barcodeData => {
-       
-       // this.scannedCode=barcodeData.text;
-       
-        this.scannedData = barcodeData.text;
-        this.phone=this.scannedData;
-       // type_operation : this.type_operation,
-        
-         // this.verif();
-          this.qrcodeexist();
-      }).catch(err => {
-        console.log('Error', err);
-      });
-    }
-  
-  
-    ionViewWillEnter() {
-     
-      this.storage.get('session_storage').then((res) => {
-        this.anggota = res;
-        this.codeacces = this.anggota.codeacces;
-        this.item_location = this.anggota.item_location;
-      });
-    }
+  // Liste des titres
+  titres: any[] = [];
+  // facteurs d'échelle (ajuste selon ta BDD)
+  priceFactor = 1; // si tu dois diviser par 10 pour avoir FCFA
+  isUpdatingAll = false;
+  globalProgress = 0;
+  message = '';
+
+  // Référence single
+  refId: string = '';
+  refNewPrice: any = '';
+  refCurrentPriceDisplay = '';
+  refUpdating = false;
+  refProgress = 0;
+
+  constructor(
+    private postPvdr: PostProvider,
+    private navCtrl: NavController,
+    private toastCtrl: ToastController
+  ) {}
 
   ngOnInit() {
+    this.loadTitres();
   }
 
-  playaudio(){
-    this.nativeAudio.preloadComplex('right', 'assets/son.wav',3,1,1);
-  this.nativeAudio.play('right');
-  }
-  playaudiofalse(){
-    this.nativeAudio.preloadComplex('right', 'assets/false.wav',3,1,1);
-  this.nativeAudio.play('right');
-  }
-  turnOnTorch(){
-    if(this.torchLight.available()){
-      this.isFlashlight = false;
-      this.torchLight.switchOn();
-    }else{
-      alert("Flashlight doesn't exist");
-    }
-  }
-
-  turnOffTorch(){
-    this.isFlashlight = true;
-    this.torchLight.switchOff();
-  }
-  addCustomer() {
-    this.router.navigate(['/scanbijoux']);
-  }
-  retour(){
-    this.router.navigate(['/customer']);
-  }
-  verifCode(){
-    return new Promise(resolve => {
-      let body = {
-        aksi: 'getqrcodeclient',
-        //limit : this.limit,
-        //start : this.start,
-        phone : this.phone,
-        //item_location:this.item_location,
-      };
-
-      this.postPvdr.postData(body, 'file_aksi.php').subscribe(data => {
-        for (let customer of data.result) {
-          this.customers.push(customer);
-          this.nom_client = customer.nom_client;
-          this.value = customer.value;
-          
-          //this.nbre =0;
-          this.totalsolde =customer.totalsolde;
-         // this.item_location=customer.item_location;
-
+  // Chargement des titres distincts depuis l'API
+  loadTitres() {
+    const body = { aksi: 'get_distinct_titres' };
+    this.postPvdr.postData(body, 'file_aksi.php').subscribe(
+      (data: any) => {
+        if (!data || !data.result) {
+          this.titres = [];
+          return;
         }
-        resolve(true);
-      });
-    });
-  }
-  testconnecion(){
-    this.network.onDisconnect().subscribe(()=>{
-    
-      setTimeout(()=>{
-        this.dialog.alert('Attention !!! vous navez plus de connexion Internet Verifier Votre Wifi ou Donne Mobile');
-              },3000);
-  
-    });
-  }
-  scanCode() {
-    this.showCamera = true;
-    // Optionally request the permission early
-    this.qrScanner.prepare()
-    .then((status: QRScannerStatus) => {
-      if (status.authorized) {
-        // start scanning
-       // console.log('Scan en cours...' + JSON.stringify(status));
-       
-        let scanSub = this.qrScanner.scan().subscribe((text: String) => {
-        //  console.log('Scanned something', text.result);
-       
-          this.textScanned = text;
-          this.phone=this.textScanned;
-          
-        
-         // this.verif();
-          this.qrcodeexist();
-         
-         //this.createdProses();
-          //this.comment=this.textScanned;
-      //this.sale_status='1';
-      
-          //this.qrScanner.hide(); // hide camera preview
-          //this.closeCamera();
-          //this.addCustomer();
-          
-           
-          
-          
-          
-         
-       
-          scanSub.unsubscribe(); // stop scanning
-          
-          this.showCamera = false;
-        
-        });
-      } else if (status.denied) {
-        // camera permission was permanently denied
-      } else {
-        // permission was denied, but not permanently. You can ask for permission again at a later time.
+        this.titres = data.result.map((t: any) => ({
+          ...t,
+          new_price: this.scaleToDisplay(t.unit_price), // pré-rempli
+          updating: false,
+          progress: 0,
+          updatedAt: null
+        }));
+      },
+      (err) => {
+        console.error('Erreur loadTitres', err);
       }
-    })
-    .catch((e: any) => console.log('Error is', e));
+    );
   }
 
-  closeCamera() {
-    this.showCamera = false;
-    this.qrScanner.hide(); // hide camera preview
-    this.qrScanner.destroy();
-    this.turnOffTorch();
-    this.retour();
-    
+  // Formatage pour affichage FCFA (espaces milliers)
+  scaleToDisplay(raw: number) {
+    if (raw === null || raw === undefined) return '';
+    const n = Math.round(Number(raw) / this.priceFactor);
+    return new Intl.NumberFormat('fr-FR').format(n);
   }
-  async qrcodeexist() {
-    this.verifCode();
-    if (this.nom_client == '') {
-      this.showAlert();
-    
-      //alert('inconu');
+
+  // retourne string "56 000 FCFA"
+  formatFCFA(raw: number) {
+    if (raw === null || raw === undefined || raw === 0) return '0 FCFA';
+    return `${this.scaleToDisplay(raw)} FCFA`;
+  }
+
+  // Convertit l'entrée utilisateur (string avec espaces) vers valeur brute attendue par l'API
+  parsePriceInput(value: any) {
+    if (value === null || value === undefined || value === '') return null;
+    const digits = String(value).replace(/\s/g, '').replace(/,/g, '').replace(/[^0-9.-]/g, '');
+    if (digits === '') return null;
+    return Math.round(Number(digits) * this.priceFactor);
+  }
+
+  async updateSingleTitre(titre: any) {
+    const newRaw = this.parsePriceInput(titre.new_price);
+    if (newRaw === null) {
+      const t = await this.toastCtrl.create({ message: 'Prix invalide', duration: 2000, color: 'warning' });
+      t.present();
+      return;
     }
-   
+    titre.updating = true;
+    titre.progress = 0;
+    try {
+      const body = { aksi: 'update_prices', type_or: titre.type_or, new_price: newRaw };
+      await this.postPvdr.postData(body, 'file_aksi.php').toPromise();
+      titre.unit_price = newRaw;
+      titre.updatedAt = new Date();
+      titre.new_price = this.scaleToDisplay(newRaw);
+      titre.progress = 1;
+      const t = await this.toastCtrl.create({ message: `Titre ${titre.type_or} mis à jour`, duration: 2000, color: 'success' });
+      t.present();
+    } catch (e) {
+      console.error(e);
+      const t = await this.toastCtrl.create({ message: 'Erreur lors de la mise à jour', duration: 2500, color: 'danger' });
+      t.present();
+    } finally {
+      titre.updating = false;
+      titre.progress = 0;
+    }
   }
 
-  async showAlert() {
-    await this.alertCtrl.create({
-header:"Voulez vous effectuer une operation de depot ou retrait ",
-
-buttons:[
-{text:'Confirmer',handler:(res)=>{
-  this.verifCode();
-  if(this.nom_client==''){
-    this.playaudiofalse();
-    alert('Erreur Ce compte depot n\'est pas  reconnu dans le system');
-    this.closeCamera();
-  }else{
-    //this.playaudio();
-    //this.createdProses();
-  }
-  
-
-}
-
-},{
-text:"Annuler",handler:(res)=>{
-  this.closeCamera();
-
-}
-}
-]
-    }).then(res =>res.present());
-  }
-  async verif(){
-    const toast = await this.toastController.create({
-      message: 'Verification en cours.... ',
-      duration: 2000
-    });
-    toast.present();
-  }
-
-
-
-  async createdDepot() {
-    if (this.comment == ''){
-      const toast = await this.toastController.create({
-        message: 'Aucune Reference Trouve',
-        duration: 2000
-      });
-      toast.present();
-    }  else {
-      let body = {
-        aksi: 'adddepotdargent',
-        phone : this.phone,
-        comment:this.comment,
-        type_operation : this.type_operation,
-        value:this.value
-       
-      };
-      this.postPvdr.postData(body,'file_sakine.php').subscribe( async data => {
-        var alertpesan = data.msg;
-        if (data.success) {
-          this.router.navigate(['/customer']);
-          const toast =await this.toastController.create({
-            message: 'depot Mis a Jour ',
-            duration: 2000
-          });
-          toast.present();
-        } else {
-          console.log(alertpesan);
-          alert(alertpesan);
-          
+  // Mettre à jour tous les titres séquentiellement (affiche progression globale)
+  async updateAll() {
+    this.isUpdatingAll = true;
+    this.globalProgress = 0;
+    const total = this.titres.length;
+    for (let i = 0; i < total; i++) {
+      const t = this.titres[i];
+      const newRaw = this.parsePriceInput(t.new_price);
+      if (newRaw !== null && newRaw !== Number(t.unit_price)) {
+        t.updating = true;
+        t.progress = 0;
+        try {
+          const body = { aksi: 'update_prices', type_or: t.type_or, new_price: newRaw };
+          await this.postPvdr.postData(body, 'file_aksi.php').toPromise();
+          t.unit_price = newRaw;
+          t.updatedAt = new Date();
+          t.progress = 1;
+        } catch (e) {
+          console.error('updateAll error for', t.type_or, e);
+        } finally {
+          t.updating = false;
         }
-      });
+      }
+      this.globalProgress = (i + 1) / total;
+    }
 
+    this.isUpdatingAll = false;
+    this.globalProgress = 0;
+    this.message = 'Mise à jour terminée avec succès !';
+    const toast = await this.toastCtrl.create({ message: this.message, duration: 3000, color: 'success' });
+    toast.present();
+    // Recharge les titres pour refléter les nouvelles valeurs formatées
+    this.loadTitres();
+  }
 
+  // Rechercher le prix actuel d'une référence (item_id)
+  fetchRefCurrentPrice() {
+    if (!this.refId || this.refId.trim() === '') {
+      this.refCurrentPriceDisplay = '';
+      return;
+    }
+    const body = { aksi: 'get_price_by_item', item_id: this.refId };
+    this.postPvdr.postData(body, 'file_aksi.php').subscribe(
+      (data: any) => {
+        if (data && data.result && data.result.length > 0) {
+          const item = data.result[0];
+          this.refCurrentPriceDisplay = this.formatFCFA(item.unit_price);
+        } else {
+          this.refCurrentPriceDisplay = 'Référence introuvable';
+        }
+      },
+      (err) => {
+        console.error(err);
+        this.refCurrentPriceDisplay = 'Erreur';
+      }
+    );
+  }
+
+  // Mettre à jour un seul item par référence (item_id)
+  async updateByReference() {
+    const raw = this.parsePriceInput(this.refNewPrice);
+    if (!this.refId || raw === null) {
+      const t = await this.toastCtrl.create({ message: 'Référence ou prix invalide', duration: 2000, color: 'warning' });
+      t.present();
+      return;
+    }
+    this.refUpdating = true;
+    this.refProgress = 0;
+    try {
+      const body = { aksi: 'update_by_item_id', item_id: this.refId, new_price: raw };
+      await this.postPvdr.postData(body, 'file_aksi.php').toPromise();
+      this.refProgress = 1;
+      const t = await this.toastCtrl.create({ message: 'Référence mise à jour', duration: 2000, color: 'success' });
+      t.present();
+      // actualiser liste et champs
+      this.refNewPrice = '';
+      this.refCurrentPriceDisplay = this.formatFCFA(raw);
+      this.loadTitres();
+    } catch (e) {
+      console.error(e);
+      const t = await this.toastCtrl.create({ message: 'Erreur lors de la mise à jour', duration: 2000, color: 'danger' });
+      t.present();
+    } finally {
+      this.refUpdating = false;
+      this.refProgress = 0;
     }
   }
 
-
+  closePage() {
+    this.navCtrl.back();
+  }
 }

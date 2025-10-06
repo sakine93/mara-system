@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { PostProvider } from '../../providers/post-provider';
 import { Router, ActivatedRoute } from '@angular/router';
 import { AlertController, LoadingController, ToastController } from '@ionic/angular';
-import { async } from 'q';
+
 import { QRScanner, QRScannerStatus } from '@ionic-native/qr-scanner/ngx';
 import { Storage } from '@ionic/storage';
 import { Flashlight } from '@ionic-native/flashlight/ngx';
@@ -322,7 +322,7 @@ export class ScanbijouxPage implements OnInit {
                 this.stockname = 'Stock Barcode';
   
                 // Demander à l'utilisateur si c'est une vente par façon ou normale
-                this.alertVenteType();
+                //this.alertVenteType();
               }
               if (this.location_id == 35) {
                 this.stockname = 'Stock HLM POIDS RECU ';

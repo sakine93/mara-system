@@ -31,7 +31,10 @@ export class InventairePage implements OnInit {
   images = [];
   imagess = [];
   imagesss = [];
-  
+  stockByType: Array<{ type_or: string, totalPoids: number, totalPieces: number }> = [];
+  totalstockpoids: number = 0;
+  totalstockpiece: number = 0;
+
   select1:any;
   img:string ='';
   imgtest:string='';
@@ -62,8 +65,7 @@ export class InventairePage implements OnInit {
   pet:any;
   totallus:any;
   totalstock:any;
-  totalstockpoids:any;
-  totalstockpiece:any;
+
   totalstocklus:any;
   nbrepiece:any;
   nbre:any;
@@ -695,15 +697,38 @@ text:"Annuler",handler:(res)=>{
       });
 
       this.postPvdr.postData(body6, 'file_aksi.php').subscribe(data => {
-        for (let customerp of data.result) {
-         
-         // this.customersbarcodes.push(customerp);
-          this.verif();
-          this.totalstockpoids = parseFloat(customerp.totalstockpoids).toFixed(2);
-          this.totalstockpiece = parseFloat(customerp.totalstockpiece).toFixed(0);
+        if (!data || !data.result) {
+          this.stockByType = [];
+          this.totalstockpoids = 0;
+          this.totalstockpiece = 0;
+          resolve(true);
+          return;
         }
+      
+        // reset
+        this.stockByType = [];
+        this.totalstockpoids = 0;
+        this.totalstockpiece = 0;
+      
+        // data.result est déjà groupé par type_or depuis le PHP
+        for (let row of data.result) {
+          const poids = parseFloat(row.totalstockpoids) || 0;
+          const pieces = parseInt(row.totalstockpiece, 10) || 0;
+      
+          this.stockByType.push({
+            type_or: row.type_or,
+            totalPoids: poids,
+            totalPieces: pieces
+          });
+      
+          this.totalstockpoids += poids;
+          this.totalstockpiece += pieces;
+        }
+      
+        // option : trier pour affichage (ex: 21k avant 18k)
+        this.stockByType.sort((a,b) => a.type_or.localeCompare(b.type_or));
+      
         resolve(true);
-        
       });
 
 

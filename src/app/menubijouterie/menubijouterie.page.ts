@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastController,AlertController,LoadingController, ModalController } from '@ionic/angular';
+import { ToastController,AlertController,LoadingController, ModalController, NavController } from '@ionic/angular';
 import { PostProvider } from '../../providers/post-provider';
 import { Storage } from '@ionic/storage';
 import { QRCodeModule } from 'angularx-qrcode';
@@ -35,11 +35,13 @@ export class MenubijouteriePage implements OnInit {
     private storage: Storage,
     public network:Network,
     public dialog:Dialogs,
+    private navCtrl:NavController,
     public alertCtrl:AlertController,
     private barcodeScanner: BarcodeScanner,
     public loadingController: LoadingController,
     public modalController: ModalController,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private toastCtrl: ToastController,
 
   ) { }
 
@@ -62,6 +64,52 @@ export class MenubijouteriePage implements OnInit {
     this.router.navigate(['/setting']);
   }
 
+  async askPinAndGo() {
+    const alert = await this.alertCtrl.create({
+      header: 'Code requis',
+      message: 'Veuillez entrer le code d\'accès pour voir les prix de l\'or',
+      inputs: [
+        {
+          name: 'pin',
+          type: 'tel',
+          placeholder: 'Entrez le code',
+        
+        }
+      ],
+      buttons: [
+        {
+          text: 'Annuler',
+          role: 'cancel'
+        },
+        {
+          text: 'Valider',
+          handler: async (data) => {
+            const entered = (data && data.pin) ? data.pin.toString().trim() : '';
+            const expected = '3333'; // code attendu
+
+            if (entered === expected) {
+              // accès autorisé -> navigue vers la page setting
+              //await this.router.navigate(['/setting']);
+              this.navCtrl.navigateRoot(['/setting']); // remplace router.navigate()
+
+            } else {
+              // accès refusé -> message d'erreur
+              const toast = await this.toastCtrl.create({
+                message: 'Code incorrect — accès refusé',
+                duration: 2000,
+                color: 'danger'
+              });
+              toast.present();
+              return false; // empêche la fermeture automatique si tu veux (ici on ferme l'alerte)
+            }
+          }
+        }
+      ],
+      backdropDismiss: false
+    });
+
+    await alert.present();
+  }
  
   menuApp(){
     this.router.navigate(['customer']);
@@ -105,7 +153,9 @@ export class MenubijouteriePage implements OnInit {
           text: 'Valider',
           handler: async (data) => {
             if (data.code === '123489') {
-              this.router.navigate(['/barcodes']);
+             // this.navigate(['/barcodes']);
+              this.navCtrl.navigateRoot(['/barcodes']); // remplace router.navigate()
+
             } else {
               const toast = await this.toastController.create({
                 message: 'Code administrateur invalide',

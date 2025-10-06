@@ -11,7 +11,7 @@ const routes: Routes = [
   { path: 'addcustomer', loadChildren: './addcustomer/addcustomer.module#AddcustomerPageModule' },
   { path: 'addcustomer/:id/:name/:desc', loadChildren: './addcustomer/addcustomer.module#AddcustomerPageModule' },
   { path: 'showcustomer/:id', loadChildren: './showcustomer/showcustomer.module#ShowcustomerPageModule' },
-  { path: 'updatecustomer/:id/:name/:desc/:prix_du_g/:poids/:location_id', loadChildren: './updatecustomer/updatecustomer.module#UpdatecustomerPageModule' },
+  { path: 'updatecustomer/:id/:name/:desc/:unit_price/:poids/:location_id', loadChildren: './updatecustomer/updatecustomer.module#UpdatecustomerPageModule' },
   { path: 'scanbijoux', loadChildren: './scanbijoux/scanbijoux.module#ScanbijouxPageModule' },
   { path: 'transfert', loadChildren: './transfert/transfert.module#TransfertPageModule' },
   { path: 'achats', loadChildren: './achats/achats.module#AchatsPageModule' },

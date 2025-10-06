@@ -1,0 +1,89 @@
+.prix-card {
+    --background: #fff8e1; /* léger jaune/or */
+    --ion-color-primary: #ffd700; /* titre doré */
+    margin-bottom: 12px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+    }
+  
+    ion-card-title {
+      color: #b8860b; /* couleur or foncé */
+      font-weight: bold;
+    }
+  
+    ion-card-subtitle {
+      color: #555;
+      font-size: 0.9em;
+    }
+  
+    ion-item {
+      --background: transparent;
+      ion-label {
+        color: #333;
+        font-weight: 500;
+      }
+  
+      ion-input {
+        border: 1px solid #ffd700;
+        border-radius: 8px;
+        padding: 5px 10px;
+      }
+    }
+  }
+  
+  ion-button {
+    margin-top: 15px;
+  }
+  
+  .prix-card {
+    margin-bottom: 12px;
+    border-radius: 10px;
+    --ion-card-background: #fff;
+    box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+  }
+  
+  .titre-name {
+    font-weight: 700;
+    font-size: 16px;
+  }
+  
+  .last-price {
+    color: #222;
+    font-weight: 600;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    align-items: center;
+  }
+  
+  .updated-note {
+    margin-left: 8px;
+    color: var(--ion-color-success);
+    font-size: 12px;
+    font-weight: 600;
+  }
+  
+  .message-item {
+    margin-top: 12px;
+  }
+  
+  .global-progress {
+    margin-top: 12px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .progress-text {
+    margin: 0;
+    font-size: 14px;
+    color: #444;
+  }
+  

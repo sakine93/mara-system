@@ -21,9 +21,10 @@ import { Dialogs } from '@ionic-native/dialogs/ngx';
 import { BarcodeScanner } from '@ionic-native/barcode-scanner/ngx';
 import {Camera} from '@ionic-native/camera/ngx'
 import {File} from '@ionic-native/file/ngx';
-import { FileOpener } from '@ionic-native/file-opener/ngx';
 import {WebView} from '@ionic-native/ionic-webview/ngx';
 import { FilePath } from '@ionic-native/file-path/ngx';
+import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
+
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -34,13 +35,13 @@ import { FilePath } from '@ionic-native/file-path/ngx';
     PostProvider,
     SplashScreen,
     QRScanner,
+    AndroidPermissions,
     Flashlight,
     BarcodeScanner,
     NativeAudio,
     Network,
     Ng2SearchPipeModule,
     FilterPipeModule,
-    FileOpener,
     QRCodeModule,
     FilePath,
     Dialogs,
