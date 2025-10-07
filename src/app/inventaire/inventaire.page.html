@@ -56,8 +56,13 @@
       
 
       <ion-item-options side="start">
-        <ion-item-option style="margin-top: 35px;font-weight: bold;" color="danger" (click)="delCustomers(customer.num_sale)">Annuler</ion-item-option>
+        <ion-item-option style="margin-top: 35px; font-weight: bold;" color="primary"
+        (click)="viewItems(customer.type_or, customer.category, customer.item_id)">
+Voir bijoux
+</ion-item-option>
+
       </ion-item-options>
+      
       <ion-item-divider style="background-color: #03224c;color: #fcb800;">
        
       </ion-item-divider>
@@ -82,7 +87,7 @@
 
         <ion-item-option style="display: none;" color="secondary" (click)="showCustomer(customer.num_sale,customer.name,customer.item_unit_price)">Voir</ion-item-option>
      
-        <ion-item-option (click)="updateCustomer(customer.num_sale,customer.name,customer.item_unit_price,customer.prix_du_g,customer.poids,customer.location_id)" style="margin-top: 35px;font-weight: bold;" color="success">Prix de vente</ion-item-option>
+        <ion-item-option (click)="updateCustomer(customer.num_sale,customer.name,customer.item_unit_price,customer.prix_du_g,customer.poids,customer.location_id)" style="margin-top: 35px;font-weight: bold;display: none;" color="success">Prix de vente</ion-item-option>
       </ion-item-options>
     </ion-item-sliding>
 
@@ -110,7 +115,7 @@
               <h2 style="font-weight:bold;color: #000;">Qte :  {{venteb.quantity}} ( p )</h2>
               <h2 style="font-weight:bold;color: #000;">Entré le : <b style="color: #fcb800;">{{venteb.heure}} </b></h2>
             </ion-label>
-            <img src="https://diantalmara.com/server_apidiantal/uploads/{{venteb.pic_filename}}" style="width: 100px; height: auto; margin-left: 20px;" alt="PAS PHOTO">
+            <img src="https://mobile.bijouteriess.com/server_apinegoce/uploads/{{venteb.pic_filename}}" style="width: 100px; height: auto; margin-left: 20px;" alt="PAS PHOTO">
           </ion-item>
           <ion-item>
             <ion-button expand="full" (click)="photos(venteb.item_id)"> <ion-icon size="large" name="camera"></ion-icon>  Modifier Photo </ion-button>
@@ -252,7 +257,26 @@ Valider Cette photo
 
 <ion-footer class="footer">
   <ion-card *ngIf="pet == 'caisse'">
-    <ion-card-header>
+    <ion-card-header style="max-height: 200px; overflow-y: auto;">
+
+      <!-- === SEGMENT DE SÉLECTION DE LOCATION (ajouté) === -->
+      <div style="margin-bottom: 8px; display:flex; align-items:center; justify-content:space-between;">
+        <ion-segment [(ngModel)]="item_location" (ionChange)="onLocationChange($event)" value="{{item_location}}" style="flex:1; max-width:320px;">
+          <ion-segment-button value="34">
+            Stock Boutique
+          </ion-segment-button>
+          <ion-segment-button style="display: none;" value="36">
+            LIBERTE 5
+          </ion-segment-button>
+        </ion-segment>
+
+        <!-- petit indicateur / bouton si tu veux recharger manuellement -->
+        <ion-button size="small" fill="clear" (click)="refreshFooter()" style="margin-left:8px;">
+          <ion-icon name="refresh"></ion-icon>
+        </ion-button>
+      </div>
+      <!-- === FIN SEGMENT === -->
+
       <ion-row>
         <ion-col size="8">
           <h3 style="margin:0;color:#c0392b;font-weight:700;font-size:14px;">État Inventaire</h3>
@@ -285,4 +309,6 @@ Valider Cette photo
     </ion-card-header>
   </ion-card>
 </ion-footer>
+
+
 

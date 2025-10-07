@@ -49,6 +49,7 @@ const routes: Routes = [
   { path: 'moninventaire', loadChildren: './moninventaire/moninventaire.module#MoninventairePageModule' },
   { path: 'bijouxmanquants', loadChildren: './bijouxmanquants/bijouxmanquants.module#BijouxmanquantsPageModule' },
   { path: 'imagemodal', loadChildren: './imagemodal/imagemodal.module#ImagemodalPageModule' },
+  { path: 'items-modal', loadChildren: './items-modal/items-modal.module#ItemsModalPageModule' },
   
 ];
 

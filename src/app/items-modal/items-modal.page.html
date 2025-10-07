@@ -1,0 +1,91 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Articles — Détails</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="close()">Fermer</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content fullscreen>
+  <ion-list *ngIf="itemsByType.length > 0" class="item-list">
+    <ion-item *ngFor="let item of itemsByType" lines="none">
+      <ion-card class="bijou-card">
+        <div class="image-container">
+          <img [src]="'https://diantalmara.com/server_apidiantal/uploads/' + item.pic_filename" alt="{{item.name}}">
+        </div>
+        <ion-card-content class="info">
+          <h2>{{item.name}} — {{item.type_or}}</h2>
+          <p>Poids : <strong>{{item.poids}} g</strong></p>
+          <p>Quantité : <strong>{{item.quantity}} p</strong></p>
+        </ion-card-content>
+      </ion-card>
+    </ion-item>
+  </ion-list>
+
+  <div *ngIf="itemsByType.length === 0" class="ion-padding no-items">
+    Aucun bijou trouvé pour cette sélection.
+  </div>
+</ion-content>
+
+<style>
+  ion-content {
+    --background: #f8f8f8;
+  }
+
+  .item-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .bijou-card {
+    width: 90%;
+    margin: 15px auto;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    background-color: #fff;
+  }
+
+  .image-container {
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fafafa;
+  }
+
+  .image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* l'image s’ajuste bien sans déformation */
+  }
+
+  ion-card-content.info {
+    text-align: center;
+    background-color: #ffffff;
+    padding: 12px;
+  }
+
+  ion-card-content.info h2 {
+    color: #03224c;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+
+  ion-card-content.info p {
+    margin: 3px 0;
+    color: #444;
+  }
+
+  .no-items {
+    text-align: center;
+    font-size: 16px;
+    color: #999;
+    font-weight: 500;
+    margin-top: 40px;
+  }
+</style>

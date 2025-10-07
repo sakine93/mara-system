@@ -19,6 +19,7 @@ import { FilePath } from '@ionic-native/file-path/ngx';
 
 
 import { async } from '@angular/core/testing';
+import { ItemsModalPage } from '../items-modal/items-modal.page';
 const STORAGE_KEY = 'my_images';
 const STORAGE_KEY2='my_images';
 const STORAGE_KEY3='my_images';
@@ -29,6 +30,9 @@ const STORAGE_KEY3='my_images';
 })
 export class InventairePage implements OnInit {
   images = [];
+  itemsByType: any[] = [];     // articles récupérés pour un titre/category + location
+itemsModalOpen: boolean = false; // si tu veux afficher inline
+loadingItems: boolean = false;
   imagess = [];
   imagesss = [];
   stockByType: Array<{ type_or: string, totalPoids: number, totalPieces: number }> = [];
@@ -92,7 +96,8 @@ export class InventairePage implements OnInit {
     private actionSheetController:ActionSheetController,
     private loadingController:LoadingController,
     private filePath: FilePath,
-    private platform: Platform
+    private platform: Platform,
+    private toastCtrl:ToastController
     
   ) { 
     this.verif();
@@ -510,6 +515,7 @@ text:"Annuler",handler:(res)=>{
     this.start = 0;
     this.loadCustomer();
     this.loadCustomerbijoux();
+    this.refreshFooter();
     this.storage.get('session_storage').then((res) => {
       this.anggota = res;
       this.username = this.anggota.username;
@@ -734,46 +740,138 @@ text:"Annuler",handler:(res)=>{
 
     });
   }
+// appelé quand on change le segment
 
-  loadCustomerbijoux() {
-    return new Promise(resolve => {
-      let body = {
-        aksi: 'getbijouxinfostock',
-        limit : this.limit,
-        start : this.start,
-        codeacces : this.term,
-        item_location : this.item_location,
-      };
-      let body1 = {
-        aksi: 'getbijouxinfovente',
-        limit : this.limit,
-        start : this.start,
-        codeacces : this.term,
-        item_location : this.item_location,
-      };
 
-      this.postPvdr.postData(body, 'file_aksi.php').subscribe(data => {
-        for (let venteb of data.result) {
-         
-          this.infostock.push(venteb);
-          break;
-         
-        }
-        resolve(true);
+// refreshFooter : recharge uniquement les données du footer (body6)
+refreshFooter() {
+  // construit le body identique à ton body6
+  const body6 = {
+    aksi: 'gettotalbarcodevitrine',
+    limit: this.limit,
+    start: this.start,
+    codeacces: this.codeacces,
+    item_location: this.item_location
+  };
+
+  this.postPvdr.postData(body6, 'file_aksi.php').subscribe((data: any) => {
+    // reset
+    this.stockByType = [];
+    this.totalstockpoids = 0;
+    this.totalstockpiece = 0;
+
+    if (!data || !data.result) return;
+
+    // data.result doit déjà être groupé par type_or côté PHP (sql fourni)
+    for (let row of data.result) {
+      const poids = parseFloat(row.totalstockpoids) || 0;
+      const pieces = parseInt(row.totalstockpiece, 10) || 0;
+
+      this.stockByType.push({
+        type_or: row.type_or,
+        totalPoids: poids,
+        totalPieces: pieces
       });
-      this.postPvdr.postData(body1, 'file_aksi.php').subscribe(data => {
-        for (let venteb of data.result) {
-          this.infosventes.push(venteb);
-          break; // arrête la boucle après avoir ajouté le premier élément
+
+      this.totalstockpoids += poids;
+      this.totalstockpiece += pieces;
+    }
+
+    // tri optionnel
+    this.stockByType.sort((a,b) => a.type_or.localeCompare(b.type_or));
+  }, err => {
+    console.error('Erreur refreshFooter', err);
+  });
+}
+
+
+// appeler la liste (utilisé quand on click "Voir bijoux")
+async viewItems(type_or: string, category: string, item_id: number) {
+  const body = {
+    aksi: 'get_items_by_type_location',
+    type_or: type_or,
+    category: category,
+    item_location: this.item_location,
+    item_id: item_id // ⚠️ filtre par item_id exact
+  };
+
+  this.postPvdr.postData(body, 'file_aksi.php').subscribe(async (data: any) => {
+    if (data.success && data.result.length > 0) {
+      const modal = await this.modalCtrl.create({
+        component: ItemsModalPage,
+        componentProps: {
+          itemsByType: data.result
         }
-        resolve(true);
       });
-      
+      await modal.present();
+    } else {
+      this.presentToast('Aucun bijou trouvé pour cette sélection.');
+    }
+  });
+}
 
-    
 
+
+
+// méthode simple : ouvre modal ou bascule une section visible inline
+openItemsModal() {
+  // solution rapide: basculer un flag pour afficher une section en bas de page
+  this.itemsModalOpen = true;
+
+  // Si tu veux un vrai modal Ionic, remplace par ModalController.create(...) et passe itemsByType en componentProps
+}
+
+// fermer la vue détails
+closeItemsModal() {
+  this.itemsModalOpen = false;
+  this.itemsByType = [];
+}
+
+// exemple d'appel quand on change location (filtre)
+onLocationChange(ev: any) {
+  const val = ev && ev.detail ? ev.detail.value : ev;
+  this.item_location = Number(val);
+  // reset customers pour recharger proprement
+  this.customers = [];
+  this.loadCustomer(); // recharge les listes avec nouvelle location
+  this.refreshFooter();
+}
+
+loadCustomerbijoux() {
+  return new Promise(resolve => {
+    // Body pour récupérer tous les bijoux en stock
+    const body = {
+      aksi: 'getbijouxinfostocks',
+      limit: this.limit,
+      start: this.start,
+      codeacces: this.codeacces,
+      item_location: this.item_location,
+    };
+
+    this.postPvdr.postData(body, 'file_aksi.php').subscribe(data => {
+      if (data && data.result) {
+        // Stocker directement dans itemsByType pour le modal
+        this.itemsByType = data.result.map(item => ({
+          id: item.id,
+          name: item.name,
+          type_or: item.type_or,
+          category: item.category,
+          poids: item.poids,
+          price: item.price,
+          // ajouter d'autres champs utiles
+        }));
+      } else {
+        this.itemsByType = [];
+      }
+      resolve(true);
+    }, err => {
+      console.error('Erreur loadCustomerbijoux', err);
+      this.itemsByType = [];
+      resolve(true);
     });
-  }
+  });
+}
+
 
   updateItems(id,category,type_or) {
     alert(id+category+type_or);

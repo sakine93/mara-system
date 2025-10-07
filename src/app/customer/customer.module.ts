@@ -13,6 +13,7 @@ import { InventairePage } from '../inventaire/inventaire.page';
 import { Ng2SearchPipeModule } from 'ng2-search-filter';
 import { PhotoProduitPage } from '../photo-produit/photo-produit.page';
 import { ModalchoixComponent } from '../modalchoix/modalchoix.component';
+import { ItemsModalPage } from '../items-modal/items-modal.page';
 const routes: Routes = [
   {
     path: '',
@@ -29,8 +30,8 @@ const routes: Routes = [
     Ng2SearchPipeModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [CustomerPage,ChoixtitreComponent,TitrevendrePage,PhotoProduitPage,ModalchoixComponent,InventairePage],
-  entryComponents:[CustomerPage,ChoixtitreComponent,TitrevendrePage,PhotoProduitPage,ModalchoixComponent,InventairePage]
+  declarations: [CustomerPage,ChoixtitreComponent,TitrevendrePage,PhotoProduitPage,ModalchoixComponent,InventairePage,ItemsModalPage],
+  entryComponents:[CustomerPage,ChoixtitreComponent,TitrevendrePage,PhotoProduitPage,ModalchoixComponent,InventairePage,ItemsModalPage]
 
 })
 export class CustomerPageModule {}

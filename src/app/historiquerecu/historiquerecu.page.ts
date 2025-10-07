@@ -68,6 +68,82 @@ export class HistoriquerecuPage implements OnInit {
     sale_id : id
  
   }
+  loadSalesReport() {
+    const start = this.daterecustock || new Date().toISOString().substring(0,10);
+    const end   = this.datefinstock || new Date().toISOString().substring(0,10);
+  
+    let body = {
+      aksi: 'get_sales_report',
+      startDate: start,
+      endDate: end
+    };
+  
+    this.postPvdr.postData(body, 'file_aksi.php').subscribe((data: any) => {
+      if (data && data.success) {
+        this.customers = data.result.map((r: any) => {
+          // Normaliser champs numériques
+          const total_pieces = parseInt(r.total_pieces, 10) || 0;
+          const total_poids  = parseFloat(r.total_poids) || 0;
+          const total_vente  = parseFloat(r.total_vente) || 0;
+  
+          // Détails : accepter 2 formats
+          let details_list: any[] = [];
+  
+          // 1) format moderne : details_list déjà en tableau d'objets
+          if (Array.isArray(r.details_list) && r.details_list.length) {
+            details_list = r.details_list.map((d: any) => ({
+              type_or: d.type_or || d.titre || d.name || '-',
+              total_poids: Number(d.total_poids || d.total_poids || 0),
+              total_pieces: parseInt(d.total_pieces || d.total_pieces || 0, 10),
+              total_vente: Number(d.total_vente || d.total_montant || 0)
+            }));
+          }
+          // 2) ancien format agrégé en string "titre::poids::qte::montant||titre2::..."
+          else if (r.details_agg && typeof r.details_agg === 'string') {
+            const parts = r.details_agg.split('||');
+            for (const p of parts) {
+              if (!p) continue;
+              const f = p.split('::');
+              details_list.push({
+                type_or: f[0] || '-',
+                total_poids: parseFloat(f[1]) || 0,
+                total_pieces: parseInt(f[2], 10) || 0,
+                total_vente: parseFloat(f[3]) || 0
+              });
+            }
+          }
+  
+          // calculs locaux (facultatif) : total poids / pieces / montant depuis details_list
+          const details_totals = details_list.reduce((acc, it) => {
+            acc.pieces += (parseInt(it.total_pieces, 10) || 0);
+            acc.poids  += (parseFloat(it.total_poids) || 0);
+            acc.montant+= (parseFloat(it.total_vente) || 0);
+            return acc;
+          }, {pieces:0, poids:0, montant:0});
+  
+          return {
+            employee_id: r.employee_id,
+            employee_name: r.employee_name || ('Emp ' + r.employee_id),
+            total_pieces: total_pieces,
+            total_poids: total_poids,
+            total_vente: total_vente,
+            details_list: details_list,
+            details_totals: details_totals,
+            showDetails: false
+          };
+        });
+  
+        // Optionnel : trier par montant décroissant
+        this.customers.sort((a,b) => b.total_vente - a.total_vente);
+      } else {
+        this.customers = [];
+      }
+    }, err => {
+      console.error('Erreur loadSalesReport', err);
+      this.customers = [];
+    });
+  }
+  
   
  
 
@@ -146,6 +222,7 @@ this.createdProses(reffacture);
     this.customers = [];
     this.start = 0;
     this.loadCustomer();
+    this.loadSalesReport();
     this.storage.get('session_storage').then((res) => {
       this.anggota = res;
       this.username = this.anggota.username;
