@@ -100,13 +100,7 @@ text:"Annuler"
   }
 
   async proseslogout() {
-    this.storage.clear();
-    this.router.navigate(['/login']);
-    const toast = await this.toastController.create({
-      message: 'Logout successful',
-      duration: 2000
-     });
-    toast.present();
+    this.router.navigate(['/customer']);
 
   }
 

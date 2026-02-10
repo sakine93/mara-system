@@ -22,7 +22,7 @@ const routes: Routes = [
     IonicModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [TitrevendrePage,CustomerPage],
-  entryComponents:[CustomerPage,TitrevendrePage]
+  declarations: [TitrevendrePage],
+  entryComponents:[TitrevendrePage]
 })
 export class TitrevendrePageModule {}

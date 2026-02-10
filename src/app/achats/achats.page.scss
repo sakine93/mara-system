@@ -1,256 +1,117 @@
-ion-header {
-
-  ion-toolbar, ion-item {
-    --background: #00d736;
-    background: #00d736;
-    padding: 0 10px;
-  }
-
-
-  ion-toolbar {
-    .bordered {
-      --border-radius: 10px;
-      --box-shadow: 5px 5px 10px #00d736, -5px -5px 10px #00d736;
-    }
-  }
-
-  ion-item {
-    h3 {
-      font-weight: 700;
-      font-size: 14px;
-    }
-
-    p {
-      font-weight: 500;
-      font-size: 14px;
-    }
-
-    ion-avatar {
-      --border-radius: 40%;
-    }
-  }
-
+/* Fond plus joli + cartes clean */
+.content-bg {
+  --background: linear-gradient(180deg, #fff7e6 0%, #ffffff 50%);
 }
 
-ion-content {
-  --background: linear-gradient(90deg, #fff 0%, #fff 35%, #fff 100%);
-
-  .slides {
-    background: #fcb800;
-    padding: 4px 10px 20px 10px;
-    border-radius: 0 0 28px 28px;
-  }
-
-  ion-card {
-      top: -20px;
-    width: 100%;
-    height: 140px;
-    box-shadow: none;
-    border-radius: 14px;
-    padding: 14px;
-    background: #d7a700;
-    .main {
-      width: 60px;
-      height: 60px;
-      border-radius: 50px;
-      background: #d7a700;
-      box-shadow:  7px 7px 20px #d7a700, 
-             -7px -7px 20px #d7a700;
-            
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      img {
-        width: 30px;
-      }
-
-      
-
-    }
-
-    .files {
-        padding-top: 14px;
-    }
-
-  }
-
-  .card2{
-    top: -43px;
-  width: 100%;
-  height: 70px;
- // box-shadow: none;
-  border-radius: 0px;
-  padding: 14px;
-  background: rgba(170, 134, 134, 0.8);
- // position: fixed;
-  margin: auto;
-  border-top-left-radius: 46px;
-  border-top-right-radius: 46px;
- 
-
-  .files {
-      padding-top: 14px;
-  }
-
-}
-.contenu{
-  position: fixed;
-  background-color: red;
+.toolbar-glass {
+  --background: #ffffffcc;
+  backdrop-filter: saturate(180%) blur(14px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
 }
 
-  .container {
-    padding: 6px 20px;
-    color: #FFFFFF;
+.username { margin-left: 8px; font-weight: 600; }
 
-    ion-item {
-      --background: rgba(255,255,255,.8);
-      padding: 0;
-      margin: 14px 0;
-      --border-radius: 14px;
-      color: #FFFFFF;
-      font-weight: 600;
-
-      ion-label {
-        padding: 6px 0;
-
-        h4 {
-          font-weight: 600;
-          font-size: 16px;
-        }
-        h6 {
-          color: rgba(255,255,255,.66);
-        }
-      }
-
-    }
-
-    h2 {
-      padding-bottom: 8px;
-    }
-
-  }
-
-}
-
-
-ion-tabs{
-ion-fab {
-      top: 1px;
-  margin-bottom: env(safe-area-inset-bottom); /* fix notch ios*/
- 
-
-}
-ion-fab ion-fab-button img{
- width: 100px;
- height: 100px;
-
-
-}
-
-.button-native{
-background-color: red;
-}
-ion-tab-bar {
-  --border: 2;
+.page-title {
   --background: transparent;
-  position: absolute;
-  bottom: 0;
-      top: 0;
-  left:0; right: 0;
-  width: 100%;
-      
-  &:after{
-    content: " ";
-    width: 100%;
-    bottom: 0;
-    background: var(--ion-color-light);
-    height: env(safe-area-inset-bottom);
-    position: absolute;
+  .title {
+    font-weight: 800;
+    color: #111;
+    font-size: 16pt;
+    letter-spacing: 0.3px;
   }
-  ion-tab-button {
-    --background: var(--ion-color-light);
-  }
-  ion-tab-button.comments {
-    margin-right: 0px;
-    border-top-right-radius: 18px;
-  }
-  ion-tab-button.notifs {
-    margin-left: 0px;
-    border-top-left-radius: 18px;
-  }
-  svg {    
-    width: 120px;
-    margin-top: 109px;
-    background-color: #d7a700;
-    path{
-      fill:  var(--ion-color-light);
-      width: 100px;
-    }		
+  .total {
+    font-weight: 700;
+    margin-top: 8px;
+    font-size: 13pt;
+    background-color: #fff4d6;
+    border: 1px solid #f7e0a3;
+    padding: 6px 10px;
+    border-radius: 8px;
+    display: inline-block;
   }
 }
-  
-}
 
-ion-tabs .btntabs{
-ion-fab {
-      top: 1px;
+/* Titres d'achat cliquables */
+.titres-wrap {
+  margin: 10px 14px 6px;
+  padding: 12px;
+  background: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 12px;
 
-}
-ion-tab-bar {
-  --border: 2;
-  --background: red;
-  position: absolute;
-  bottom: 0;
-      top: 0;
-  left:0; right: 0;
-  width: 100%;
-      
-  &:after{
-    content: " ";
-    width: 100%;
-    bottom: 0;
-    background: var(--ion-color-light);
-    height: env(safe-area-inset-bottom);
-    position: absolute;
+  .titres-head {
+    display: flex; align-items: center; justify-content: space-between;
+    font-weight: 700; color: #333; margin-bottom: 8px;
   }
-  ion-tab-button {
-    --background: var(--ion-color-light);
+
+  .titres-list {
+    display: flex; flex-wrap: wrap; gap: 8px;
   }
-  ion-tab-button.comments {
-    margin-right: 0px;
-    border-top-right-radius: 18px;
-  }
-  ion-tab-button.notifs {
-    margin-left: 0px;
-    border-top-left-radius: 18px;
-  }
-  svg {    
-    width: 72px;
-    margin-top: 19px;
-    path{
-      fill:  var(--ion-color-light);
-    }		
+
+  .titre-chip {
+    --background: #fff;
+    --color: #333;
+    --border-color: #f0c24f;
+    border: 1px solid #f0c24f;
+    border-radius: 14px;
+    font-weight: 600;
   }
 }
-  
-}
 
-.footer{
-  background-color: #fcb800;
-}
-
-
-.ion-card  .img{
-  top: 0px;
-  width: 100px;
-  height: 80px;
-  
-  border-radius: 14px;
-  padding: 14px;
-  background: #fcb800;
-  
-
-
-      
+/* Liste achats */
+.achat-list {
+  margin: 6px 10px 120px;
+  .achat-titre {
+    font-weight: 700;
+    font-size: 11pt;
+    display: flex; align-items: center; gap: 6px;
   }
+  .achat-row {
+    --background: #fff;
+    border-left: 3px solid #fcb800;
+    margin-bottom: 8px;
+    border-radius: 10px;
+  }
+  .achat-infos {
+    font-size: 10.5pt; font-weight: 600; color: #222;
+    .line { margin: 2px 0; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 9pt;
+      background: #fff7d6;
+      border: 1px solid #ffe29a;
+    }
+  }
+}
+
+/* Barre d’actions en bas */
+.bottom-actions {
+  position: sticky;
+  bottom: 0; left: 0; right: 0;
+  display: flex; gap: 12px; padding: 12px;
+  background: linear-gradient(180deg, transparent, #fff 35%);
+  border-top: 1px solid #eee;
+
+  .btn-retour {
+    flex: 1;
+    font-weight: 700;
+    --border-radius: 10px;
+  }
+  .btn-caisse {
+    flex: 1;
+    font-weight: 700;
+    --border-radius: 10px;
+  }
+}
+
+/* Boutons bordés réutilisables */
+ion-menu-button.bordered,
+ion-button.bordered {
+  --background: #fff;
+  --border-color: #e5e7eb;
+  --color: #111;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}

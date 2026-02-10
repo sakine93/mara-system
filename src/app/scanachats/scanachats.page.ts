@@ -14,6 +14,8 @@ import { BarcodeScanner, BarcodeScannerOptions } from '@ionic-native/barcode-sca
   styleUrls: ['./scanachats.page.scss'],
 })
 export class ScanachatsPage implements OnInit {
+  titres: any[] = [];
+loadingTitres: boolean = false;
   scannedData: any;
   encodedData: '';
   encodeData: any;
@@ -64,7 +66,32 @@ export class ScanachatsPage implements OnInit {
     }
 
   ngOnInit() {
-    this.scanCode();
+    this.loadTitres();
+  }
+
+
+  loadTitres() {
+    this.loadingTitres = true;
+    const body = { aksi: 'getalltitre' };
+  
+    this.postPvdr.postData(body, 'file_aksi.php').subscribe(
+      (data: any) => {
+        if (data && data.success && Array.isArray(data.result)) {
+          this.titres = data.result; // [{id_titre, nom_titre}, ...]
+        } else {
+          this.titres = [];
+        }
+        this.loadingTitres = false;
+      },
+      (_err) => {
+        this.titres = [];
+        this.loadingTitres = false;
+        this.toastController.create({
+          message: 'Erreur de chargement des titres',
+          duration: 2000
+        }).then(t => t.present());
+      }
+    );
   }
 
   playaudio(){

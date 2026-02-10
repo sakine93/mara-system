@@ -30,8 +30,8 @@ const routes: Routes = [
     Ng2SearchPipeModule,
     RouterModule.forChild(routes)
   ],
-  declarations: [CustomerPage,ChoixtitreComponent,TitrevendrePage,PhotoProduitPage,ModalchoixComponent,InventairePage,ItemsModalPage],
-  entryComponents:[CustomerPage,ChoixtitreComponent,TitrevendrePage,PhotoProduitPage,ModalchoixComponent,InventairePage,ItemsModalPage]
+  declarations: [CustomerPage,ChoixtitreComponent,ModalchoixComponent,InventairePage,ItemsModalPage],
+  entryComponents:[CustomerPage,ChoixtitreComponent,ModalchoixComponent,InventairePage,ItemsModalPage]
 
 })
 export class CustomerPageModule {}

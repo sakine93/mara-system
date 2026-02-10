@@ -28,8 +28,8 @@ const routes: Routes = [
     RouterModule.forChild(routes)
   ],
 
-  declarations: [InventairePage,FaturerecuPage,FacturebijouxComponent,FacturebijouxPage,CustomerPage],
-  entryComponents:[InventairePage,FaturerecuPage,FacturebijouxComponent,FacturebijouxPage,CustomerPage]
+  declarations: [FaturerecuPage,FacturebijouxComponent,FacturebijouxPage],
+  entryComponents:[FaturerecuPage,FacturebijouxComponent,FacturebijouxPage]
 
 })
 export class InventairePageModule {}

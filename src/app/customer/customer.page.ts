@@ -365,7 +365,7 @@ text:"Annuler",handler:(res)=>{
   home(){
    // this.nondispo();
    //this.router.navigate(['/scanachats']);
-   this.router.navigate(['updateachatpoids']);
+   this.router.navigate(['achats']);
   }
 
   async nondispo() {
