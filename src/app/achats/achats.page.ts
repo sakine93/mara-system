@@ -1,11 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { ToastController,AlertController } from '@ionic/angular';
+import { ToastController, AlertController } from '@ionic/angular';
 import { PostProvider } from '../../providers/post-provider';
 import { Storage } from '@ionic/storage';
-import { QRCodeModule } from 'angularx-qrcode';
-import { Network } from '@ionic-native/network/ngx';
-import { Dialogs } from '@ionic-native/dialogs/ngx';
 
 @Component({
   selector: 'app-achats',
@@ -14,221 +11,160 @@ import { Dialogs } from '@ionic-native/dialogs/ngx';
 })
 export class AchatsPage implements OnInit {
 
-  achats: any = [];
-  limit: number = 10;
-  start: number = 0;
-  username: string;
-  anggota: any;
-  comment:string;
-  codeacces: any;
-  totalachats:any;
-  nbre:any;
-  require:any;
-  id:number;
+  achats: any[] = [];
+  titres: any[] = [];
+  totalachats = 0;
+  username = '';
+  codeacces = '';
+  clientName = '';
 
   constructor(
     private router: Router,
     private postPvdr: PostProvider,
-    public toastController: ToastController,
-    private storage: Storage,
-    public network:Network,
-    public dialog:Dialogs,
-    public alertCtrl:AlertController
-  ) { 
-    
-    this.network.onDisconnect().subscribe(()=>{
-    
-      setTimeout(()=>{
-        this.dialog.alert('Attention !!! vous navez plus de connexion Internet Verifier Votre Wifi ou Donne Mobile');
-              },3000);
-  
-    });
-    this.network.onConnect().subscribe(()=>{
-    
-    })
-  }
-  slidesOptions = {
-    slidesPerView: 1.5
-  }
+    private toastCtrl: ToastController,
+    private alertCtrl: AlertController,
+    private storage: Storage
+  ) {}
 
   ngOnInit() {
-    //this.ionViewWillEnter();
-  }
-montrer(){
-  this.showAlert();
-}
-testconnexion(){
-  this.network.onDisconnect().subscribe(()=>{
-    
-    setTimeout(()=>{
-      this.dialog.alert('Attention !!! vous navez plus de connexion Internet Verifier Votre Wifi ou Donne Mobile');
-            },3000);
-
-  });
-}
-
-  
-  async showAlert() {
-    await this.alertCtrl.create({
-header:"Entrer le nom et telephone du Client",
-inputs:[{
-type:'text',name:'comment'
-}],
-buttons:[
-{text:'Valider',handler:(res)=>{
-  this.comment=res.comment;
-
-}
-
-},{
-text:"Annuler"
-}
-]
-    }).then(res =>res.present());
+    this.ionViewWillEnter();
   }
 
   ionViewWillEnter() {
-    this.achats = [];
-    this.start = 0;
-    this.loadAchats();
-    this.storage.get('session_storage').then((res) => {
-      this.anggota = res;
-      this.username = this.anggota.username;
-      this.codeacces = this.anggota.codeacces;
-      this.nbre= 0;
+    this.storage.get('session_storage').then(res => {
+      if (res) {
+        this.username = res.username;
+        this.codeacces = res.codeacces;
+  
+        // 🔥 ICI SEULEMENT
+        this.loadAchats();
+      }
     });
   }
 
-  async proseslogout() {
-    this.router.navigate(['/customer']);
-
-  }
-
-
-  addCustomer() {
-  //  alert('test');
-    this.router.navigate(['/scanachats']);
-  }
-  acceuil(){
-    this.router.navigate(['/customer']);
-  }
-  addCustomerb() {
-    this.router.navigate(['/addcustomer']);
-  }
-
-  updateAchat(id,titre) {
-    this.router.navigate(['/updateachat/' + id + '/' + titre ]);
-  }
-
-  showAchat(id, titre) {
-    this.router.navigate(['/showcustomer/' + id + '/' + titre ]);
-  }
-  envoicaisse(){
-    alert('je marche lenvoie...');
-  }
-
-  doRefresh(event) {
-    setTimeout(() => {
-      this.ionViewWillEnter();
-      event.target.complete();
-    }, 500);
-  }
-
-  loadData(event: any) {
-    this.start += this.limit;
-    setTimeout(() => {
-    this.loadAchats().then(() => {
-    event.target.complete();
+  loadSession() {
+    this.storage.get('session_storage').then(res => {
+      if (res) {
+        this.username = res.username;
+        this.codeacces = res.codeacces;
+      }
     });
-    }, 500);
-  }
-
-
-  delCustomers(id) {
-    let body = {
-        aksi: 'deleteachats',
-        achat_id : id
-      };
-
-    this.postPvdr.postData(body, 'file_aksi.php').subscribe(data => {
-        this.ionViewWillEnter();
-      });
   }
 
   loadAchats() {
-    return new Promise(resolve => {
-      let body = {
-        aksi: 'getachats',
-        limit : this.limit,
-        start : this.start,
-        codeacces : this.codeacces,
-      };
+    this.postPvdr.postData(
+      { aksi: 'getachats', codeacces: this.codeacces },
+      'file_aksi.php'
+    ).subscribe(data => {
+      this.achats = data.result ? data.result : [];
+    });
 
-      let body2 = {
-        aksi: 'gettotalachats',
-        limit : this.limit,
-        start : this.start,
-        codeacces : this.codeacces,
-      };
-
-      this.postPvdr.postData(body, 'file_aksi.php').subscribe(data => {
-        for (let achat of data.result) {
-         
-          this.achats.push(achat);
-         
-        }
-        resolve(true);
-      });
-
-      this.postPvdr.postData(body2, 'file_aksi.php').subscribe(data => {
-        for (let achat of data.result) {
-          this.nbre =0;
-          this.totalachats =achat.totalachats;
-        
-         
-        }
-        resolve(true);
-      });
+    this.postPvdr.postData(
+      { aksi: 'gettotalachats', codeacces: this.codeacces },
+      'file_aksi.php'
+    ).subscribe(data => {
+      if (data.result && data.result.length > 0) {
+        this.totalachats = data.result[0].totalachats;
+      } else {
+        this.totalachats = 0;
+      }
     });
   }
-  
 
-  async createdProses() {
-     if(this.comment==''){
-      const toast = await this.toastController.create({
-        message: 'Les infos du clients st obligatoires',
-        duration: 2000
-      });
-    }
-   
-     else {
-      let body = {
-        aksi: 'envoiecaisseachats',
-        comment : this.comment,
-     
-       // sale_status : '1',
-        codeacces:this.codeacces,
-       
-       
-      };
-      this.postPvdr.postData(body, 'file_aksi.php').subscribe( async data => {
-        var alertpesan = data.msg;
-        if (data.success) {
-          
-          const toast = await this.toastController.create({
-            message: 'Les achats ont été bien envoyé a la caisse ',
-            duration: 2000
-          });
-          toast.present();
-          this.ionViewWillEnter();
-        } else {
-          const toast = await this.toastController.create({
-            message: alertpesan,
-            duration: 2000
-          });
-        }
-      });
-    }
+  addCustomer() {
+    this.router.navigate(['/scanachats']);
   }
 
+  updateAchat(id, titre) {
+    this.router.navigate(['/updateachat/' + id + '/' + titre]);
+  }
+
+  delCustomers(id) {
+    this.postPvdr.postData(
+      { aksi: 'deleteachats', achat_id: id },
+      'file_aksi.php'
+    ).subscribe(() => {
+      this.loadAchats();
+    });
+  }
+
+  async showClient() {
+    const alert = await this.alertCtrl.create({
+      header: 'Client',
+      inputs: [{ name: 'client', type: 'text', placeholder: 'Nom et téléphone' }],
+      buttons: [
+        { text: 'Annuler', role: 'cancel' },
+        {
+          text: 'Valider',
+          handler: data => {
+            if (data.client) this.clientName = data.client;
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+
+  async createdProses() {
+
+    if (!this.clientName) {
+      const toast = await this.toastCtrl.create({
+        message: 'Veuillez renseigner le client',
+        duration: 2000,
+        color: 'danger'
+      });
+      toast.present();
+      return;
+    }
+  
+    const body = {
+      aksi: 'envoiecaisseachats',
+      comment: this.clientName,
+      codeacces: this.codeacces
+    };
+  
+    this.postPvdr.postData(body, 'file_aksi.php')
+      .subscribe({
+        next: async res => {
+          if (res.success) {
+            const toast = await this.toastCtrl.create({
+              message: '✅ Achats envoyés à la caisse',
+              duration: 2000,
+              color: 'success'
+            });
+            toast.present();
+  
+            this.clientName = '';
+            this.achats = [];
+            this.totalachats = 0;
+  
+            this.loadAchats();
+          } else {
+            const toast = await this.toastCtrl.create({
+              message: res.msg || 'Erreur côté serveur',
+              duration: 2000,
+              color: 'danger'
+            });
+            toast.present();
+          }
+        },
+        error: async err => {
+          console.error('API ERROR', err);
+          const toast = await this.toastCtrl.create({
+            message: '❌ API indisponible',
+            duration: 2000,
+            color: 'danger'
+          });
+          toast.present();
+        }
+      });
+  }
+
+  acceuil() {
+    this.router.navigate(['/customer']);
+  }
+
+  proseslogout() {
+    this.router.navigate(['/customer']);
+  }
 }

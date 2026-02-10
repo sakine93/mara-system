@@ -1,122 +1,94 @@
 <ion-header class="ion-no-border">
-  <ion-toolbar class="toolbar-glass">
+  <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-menu-button class="bordered" menu="main-menu" id="menu"></ion-menu-button>
-      <ion-button fill="clear" (click)="goBack()">
+      <ion-menu-button></ion-menu-button>
+      <ion-button fill="clear" (click)="acceuil()">
         <ion-icon name="arrow-back"></ion-icon>
       </ion-button>
-      <b class="username">({{ username }})</b>
+      <b>({{ username }})</b>
     </ion-buttons>
 
     <ion-buttons slot="end">
-      <ion-button class="bordered" (click)="proseslogout()" fill="solid" color="light">
-        <ion-icon color="danger" name="arrow-back"></ion-icon>
+      <ion-button fill="clear" color="danger" (click)="proseslogout()">
+        <ion-icon name="log-out"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 
-  <ion-item lines="none" class="page-title">
+  <ion-item lines="none">
     <ion-label>
-      <p class="title">ACHATS OR</p>
-      <h3 *ngIf="totalachats>0" class="total">{{ totalachats | number:'1.0-0' }} FCFA</h3>
-
-      <!-- code accès masqué conservé -->
-      <ion-item style="display:none;">
-        <ion-label position="floating"></ion-label>
-        <ion-input [(ngModel)]="codeacces"></ion-input>
-      </ion-item>
+      <h2>ACHATS OR</h2>
+      <h3 *ngIf="totalachats > 0">
+        {{ totalachats | number:'1.0-0' }} FCFA
+      </h3>
     </ion-label>
   </ion-item>
 </ion-header>
 
-<ion-content class="content-bg" fullscreen>
+<ion-content>
 
-  <!-- Titres d’achat cliquables -->
+  <!-- AJOUT DES TITRES (LOGIQUE CONSERVÉE) -->
   <div class="titres-wrap">
     <div class="titres-head">
       <div>Ajouter des titres d’achat</div>
       <ion-button size="small" fill="outline" (click)="addCustomer()">
-        <ion-icon name="add-circle-outline" slot="start"></ion-icon> Ajouter
+        <ion-icon name="add-circle-outline" slot="start"></ion-icon>
+        Ajouter
       </ion-button>
     </div>
 
     <div class="titres-list">
-      <ion-chip *ngFor="let t of titres"
-                (click)="addTitre(t)"
-                outline="true"
-                class="titre-chip">
+      <ion-chip *ngFor="let t of titres" (click)="addTitre(t)">
         <ion-icon name="pricetag" color="warning"></ion-icon>
         <ion-label>{{ t }}</ion-label>
       </ion-chip>
     </div>
   </div>
 
-  <!-- Liste des achats -->
-  <ion-list class="achat-list">
+  <!-- LISTE DES ACHATS -->
+  <ion-list>
     <ion-item-sliding *ngFor="let achat of achats">
+
       <ion-item-options side="start">
         <ion-item-option color="danger" (click)="delCustomers(achat.achat_id)">
           Annuler
         </ion-item-option>
       </ion-item-options>
 
-      <ion-item-divider color="danger">
-        <ion-label class="achat-titre">
-          <ion-icon name="qr-scanner" size="small"></ion-icon>
-          {{ achat.titre }}
-        </ion-label>
+      <ion-item-divider color="light">
+        {{ achat.titre }}
       </ion-item-divider>
 
-      <ion-item class="achat-row">
-        <ion-label class="achat-infos">
-          <div class="line">
-            <span class="badge">Poids</span> : {{ achat.poids | number:'1.2-2' }} g
-          </div>
-          <div class="line">
-            <span class="badge">Prix</span> : {{ achat.amount | number:'1.0-0' }} FCFA
-          </div>
+      <ion-item>
+        <ion-label>
+          <p>Poids : {{ achat.poids }} g</p>
+          <p>Prix : {{ achat.amount }} FCFA</p>
         </ion-label>
 
-        <ion-buttons slot="end">
-          <ion-button color="success" (click)="updateAchat(achat.achat_id, achat.titre, achat.amount)">
-            Prix d'achat
-          </ion-button>
-        </ion-buttons>
+        <ion-button slot="end" color="success"
+          (click)="updateAchat(achat.achat_id, achat.titre)">
+          Modifier
+        </ion-button>
       </ion-item>
 
-      <ion-item-options side="end">
-        <ion-item-option style="display:none" color="secondary"
-          (click)="showCustomer(achat.num_sale, achat.name, achat.item_unit_price)">
-          Voir
-        </ion-item-option>
-      </ion-item-options>
     </ion-item-sliding>
   </ion-list>
 
-  <!-- Pull to refresh conservé -->
-  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
-    <ion-refresher-content
-      pullingIcon="arrow-dropdown"
-      pullingText="Tirer pour rafraîchir"
-      refreshingSpinner="circles"
-      refreshingText="Rafraîchissement...">
-    </ion-refresher-content>
-  </ion-refresher>
+  <!-- CLIENT (AJOUTÉ SANS CASSER) -->
+  <ion-button expand="block" color="primary" (click)="showClient()">
+    👤 Renseigner le client
+  </ion-button>
 
-  <!-- Barre d’action simple -->
-  <div class="bottom-actions">
-    <ion-button (click)="acceuil()" fill="solid" color="warning" class="btn-retour">
-      <ion-icon name="home" slot="start"></ion-icon>
-      Retour Ventes
-    </ion-button>
+  <ion-text color="success" *ngIf="clientName">
+    Client : <b>{{ clientName }}</b>
+  </ion-text>
 
-    <ion-button *ngIf="totalachats>0"
-                (click)="createdProses()"
-                shape="round"
-                color="danger"
-                class="btn-caisse">
-      <ion-icon name="send" slot="start"></ion-icon>
-      Envoyer 
-    </ion-button>
-  </div>
+  <!-- ENVOI CAISSE -->
+  <ion-button expand="block"
+    color="danger"
+    (click)="createdProses()"
+    *ngIf="totalachats > 0">
+    📤 Envoyer à la caisse
+  </ion-button>
+
 </ion-content>

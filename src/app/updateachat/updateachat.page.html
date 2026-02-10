@@ -1,145 +1,69 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>Details Achats</ion-title>
+    <ion-title>Détails Achats</ion-title>
     <ion-buttons slot="primary">
-      <ion-back-button text="Back" icon="" color="tertiary" fill="outline"></ion-back-button>
+      <ion-back-button></ion-back-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
 
-  <!-- REF TITRE -->
   <ion-item>
     <ion-label position="floating">Ref Titre</ion-label>
-    <ion-input readonly type="text" [(ngModel)]="titre"></ion-input>
+    <ion-input readonly [(ngModel)]="titre"></ion-input>
   </ion-item>
 
-  <!-- POIDS -->
   <ion-item>
     <ion-label position="floating">Poids (g)</ion-label>
     <ion-input type="number" [(ngModel)]="poids"></ion-input>
   </ion-item>
 
-  <!-- PRIX -->
   <ion-item>
     <ion-label position="floating">Prix d'achat</ion-label>
     <ion-input type="number" [(ngModel)]="amount"></ion-input>
   </ion-item>
 
-  <!-- CLIENT -->
-  <ion-item>
-    <ion-label position="floating">Client</ion-label>
-    <ion-input type="text" [(ngModel)]="supplier_name"></ion-input>
-  </ion-item>
-
-  <!-- PHOTO BIJOU -->
+  <!-- BIJOU -->
   <ion-card>
-    <ion-card-header>
-      📸 Photo du bijou <span class="required">*</span>
-    </ion-card-header>
-
+    <ion-card-header>📸 Photo du bijou *</ion-card-header>
     <ion-card-content>
-      <div
-        class="upload-box"
-        [class.error-box]="!imgBijou"
-        (click)="selectImage('bijou')"
-      >
-        <ion-icon *ngIf="!imgBijou" name="camera" size="large"></ion-icon>
+      <div class="upload-box" (click)="openFile('bijou')">
         <ion-img *ngIf="imgBijou" [src]="imgBijou"></ion-img>
+        <ion-icon *ngIf="!imgBijou" name="camera" size="large"></ion-icon>
       </div>
-
-      <ion-text color="danger" *ngIf="!imgBijou">
-        <p class="error-text">Photo du bijou obligatoire</p>
-      </ion-text>
-
-      <ion-button
-        *ngIf="imgBijou"
-        color="danger"
-        expand="block"
-        fill="outline"
-        size="small"
-        (click)="cancelImage('bijou')"
-      >
-        Annuler la photo
-      </ion-button>
+      <input type="file" accept="image/*" capture="environment"
+             hidden #fileBijou (change)="onFileSelected($event,'bijou')">
     </ion-card-content>
   </ion-card>
 
-  <!-- CNI RECTO -->
+  <!-- RECTO -->
   <ion-card>
-    <ion-card-header>
-      🪪 CNI Recto <span class="required">*</span>
-    </ion-card-header>
-
+    <ion-card-header>🪪 CNI Recto *</ion-card-header>
     <ion-card-content>
-      <div
-        class="upload-box"
-        [class.error-box]="!imgRecto"
-        (click)="selectImage('recto')"
-      >
-        <ion-icon *ngIf="!imgRecto" name="camera" size="large"></ion-icon>
+      <div class="upload-box" (click)="openFile('recto')">
         <ion-img *ngIf="imgRecto" [src]="imgRecto"></ion-img>
+        <ion-icon *ngIf="!imgRecto" name="camera" size="large"></ion-icon>
       </div>
-
-      <ion-text color="danger" *ngIf="!imgRecto">
-        <p class="error-text">CNI recto obligatoire</p>
-      </ion-text>
-
-      <ion-button
-        *ngIf="imgRecto"
-        color="danger"
-        expand="block"
-        fill="outline"
-        size="small"
-        (click)="cancelImage('recto')"
-      >
-        Annuler la photo
-      </ion-button>
+      <input type="file" accept="image/*" capture="environment"
+             hidden #fileRecto (change)="onFileSelected($event,'recto')">
     </ion-card-content>
   </ion-card>
 
-  <!-- CNI VERSO -->
+  <!-- VERSO -->
   <ion-card>
-    <ion-card-header>
-      🪪 CNI Verso <span class="required">*</span>
-    </ion-card-header>
-
+    <ion-card-header>🪪 CNI Verso *</ion-card-header>
     <ion-card-content>
-      <div
-        class="upload-box"
-        [class.error-box]="!imgVerso"
-        (click)="selectImage('verso')"
-      >
-        <ion-icon *ngIf="!imgVerso" name="camera" size="large"></ion-icon>
+      <div class="upload-box" (click)="openFile('verso')">
         <ion-img *ngIf="imgVerso" [src]="imgVerso"></ion-img>
+        <ion-icon *ngIf="!imgVerso" name="camera" size="large"></ion-icon>
       </div>
-
-      <ion-text color="danger" *ngIf="!imgVerso">
-        <p class="error-text">CNI verso obligatoire</p>
-      </ion-text>
-
-      <ion-button
-        *ngIf="imgVerso"
-        color="danger"
-        expand="block"
-        fill="outline"
-        size="small"
-        (click)="cancelImage('verso')"
-      >
-        Annuler la photo
-      </ion-button>
+      <input type="file" accept="image/*" capture="environment"
+             hidden #fileVerso (change)="onFileSelected($event,'verso')">
     </ion-card-content>
   </ion-card>
 
-  <!-- VALIDATION -->
-  <ion-button
-    expand="block"
-    padding
-    color="tertiary"
-    fill="outline"
-    (click)="updateachatProses()"
-  >
+  <ion-button expand="block" color="tertiary" (click)="updateachatProses()">
     Valider
   </ion-button>
 

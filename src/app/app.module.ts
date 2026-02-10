@@ -24,7 +24,7 @@ import {File} from '@ionic-native/file/ngx';
 import {WebView} from '@ionic-native/ionic-webview/ngx';
 import { FilePath } from '@ionic-native/file-path/ngx';
 import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
-
+import { ImagePicker } from '@ionic-native/image-picker/ngx';
 @NgModule({
   declarations: [AppComponent],
   entryComponents: [],
@@ -39,6 +39,7 @@ import { AndroidPermissions } from '@ionic-native/android-permissions/ngx';
     Flashlight,
     BarcodeScanner,
     NativeAudio,
+    ImagePicker,
     Network,
     Ng2SearchPipeModule,
     FilterPipeModule,
